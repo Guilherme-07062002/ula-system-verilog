@@ -1,16 +1,18 @@
+`timescale 1ns/1ps
+
 module tb_ula_8_bits;
 
-    // Sinais para conectar ao DUT (Device Under Test)
+    // Sinais de entrada
     reg [7:0] a, b;
     reg [3:0] s;
-    reg       m;
-    reg       c_in;
+    reg m, c_in;
+    
+    // Sinais de saída
     wire [7:0] f;
-    wire       a_eq_b;
-    wire       c_out;
-
+    wire a_eq_b, c_out;
+    
     // Instanciação da ULA de 8 bits
-    ula_8_bits dut_8_bits (
+    ula_8_bits uut (
         .a(a),
         .b(b),
         .s(s),
@@ -20,77 +22,106 @@ module tb_ula_8_bits;
         .a_eq_b(a_eq_b),
         .c_out(c_out)
     );
-
-    // Configuração para geração de arquivo VCD
+    
+    // Variáveis para controle do teste
+    integer i, j;
+    
     initial begin
+        // Configuração para gerar arquivo VCD
         $dumpfile("ula_8_bits.vcd");
-        $dumpvars(0, tb_ula_8_bits); // Dump all signals in the current scope
-    end
-
-    initial begin
-        $display("---------------------------------------------------------------------------------------------------------------------------------------------");
-        $display("Iniciando simulação da ULA de 8 bits");
-        $display("m | s    | a        | b        | c_in | f        | c_out | a_eq_b | Operação");
-        $display("---------------------------------------------------------------------------------------------------------------------------------------------");
-
-        // Loop para testar todas as 32 funções
-        for (m = 0; m <= 1; m = m + 1) begin // Modo (0: Aritmético, 1: Lógico)
-            for (s = 0; s <= 15; s = s + 1) begin // Seleção de Função (0 a 15)
-                // Testar com diferentes valores de A, B e C_in de 8 bits
-
-                // Exemplo 1: Valores básicos
-                a = 8'h3F; // 63
-                b = 8'h0A; // 10
-                c_in = 1'b0;
-                #10;
-                $display("%b | %b | %h     | %h     | %b    | %h     | %b     | %b      | Teste 1", m, s, a, b, c_in, f, c_out, a_eq_b);
-
-                // Exemplo 2: Valores maiores e carry-in
-                a = 8'hF0; // 240
-                b = 8'h1C; // 28
-                c_in = 1'b1;
-                #10;
-                $display("%b | %b | %h     | %h     | %b    | %h     | %b     | %b      | Teste 2", m, s, a, b, c_in, f, c_out, a_eq_b);
-
-                // Exemplo 3: Borda de valores (máximo)
-                a = 8'hFF; // 255
-                b = 8'h01; // 1
-                c_in = 1'b0;
-                #10;
-                $display("%b | %b | %h     | %h     | %b    | %h     | %b     | %b      | Teste 3", m, s, a, b, c_in, f, c_out, a_eq_b);
-
-                // Exemplo 4: Igualdade de A e B
-                a = 8'hAA; // 170
-                b = 8'hAA; // 170
-                c_in = 1'b0;
-                #10;
-                $display("%b | %b | %h     | %h     | %b    | %h     | %b     | %b      | Teste 4", m, s, a, b, c_in, f, c_out, a_eq_b);
+        $dumpvars(0, tb_ula_8_bits);
+        
+        $display("=== Testbench ULA 8 bits ===");
+        $display("Testando todas as 32 funções com operandos de 8 bits");
+        $display("Formato: Modo | S | A | B | Cin || F | A=B | Cout");
+        $display("--------------------------------------------------------------------");
+        
+        // Teste das funções lógicas (m = 1)
+        m = 1'b1;
+        c_in = 1'b0;
+        
+        $display("\n=== MODO LÓGICO (M=1) - 8 bits ===");
+        
+        for (s = 0; s < 16; s = s + 1) begin
+            $display("\nFunção S=%04b:", s);
+            
+            // Testa diferentes combinações de A e B (8 bits)
+            for (i = 0; i < 6; i = i + 1) begin
+                case (i)
+                    0: begin a = 8'b00000000; b = 8'b00000000; end
+                    1: begin a = 8'b11111111; b = 8'b00000000; end
+                    2: begin a = 8'b00000000; b = 8'b11111111; end
+                    3: begin a = 8'b11111111; b = 8'b11111111; end
+                    4: begin a = 8'b10101010; b = 8'b01010101; end
+                    5: begin a = 8'b11110000; b = 8'b00001111; end
+                endcase
                 
-                // Exemplo 5: Teste com carry para o MSB
-                a = 8'h0F; // 15
-                b = 8'h01; // 1
-                c_in = 1'b0;
-                m = 0; // Modo aritmético
-                s = 4'b0001; // A + B + C_in
                 #10;
-                $display("%b | %b | %h     | %h     | %b    | %h     | %b     | %b      | Teste 5 (Carry LSB->MSB)", m, s, a, b, c_in, f, c_out, a_eq_b);
-                
-                a = 8'h10; // 16
-                b = 8'h01; // 1
-                c_in = 1'b0;
-                m = 0; // Modo aritmético
-                s = 4'b0001; // A + B + C_in
-                #10;
-                $display("%b | %b | %h     | %h     | %b    | %h     | %b     | %b      | Teste 6 (No Carry LSB->MSB)", m, s, a, b, c_in, f, c_out, a_eq_b);
-
-                // Adicione mais vetores de teste para cobrir uma gama completa
-                // de operações e garantir que o ripple carry esteja funcionando.
+                $display("  LOG  | %04b | %08b | %08b | %b || %08b | %b | %b", 
+                        s, a, b, c_in, f, a_eq_b, c_out);
             end
         end
-
-        $display("---------------------------------------------------------------------------------------------------------------------------------------------");
-        $display("Simulação da ULA de 8 bits concluída.");
-        $display("---------------------------------------------------------------------------------------------------------------------------------------------");
+        
+        // Teste das funções aritméticas (m = 0)
+        m = 1'b0;
+        
+        $display("\n=== MODO ARITMÉTICO (M=0) - 8 bits ===");
+        
+        for (s = 0; s < 16; s = s + 1) begin
+            $display("\nFunção S=%04b:", s);
+            
+            // Testa diferentes combinações de A, B e Cin (8 bits)
+            for (i = 0; i < 8; i = i + 1) begin
+                case (i)
+                    0: begin a = 8'b00000000; b = 8'b00000000; c_in = 1'b0; end
+                    1: begin a = 8'b00000000; b = 8'b00000000; c_in = 1'b1; end
+                    2: begin a = 8'b01010101; b = 8'b00110011; c_in = 1'b0; end
+                    3: begin a = 8'b01010101; b = 8'b00110011; c_in = 1'b1; end
+                    4: begin a = 8'b11111111; b = 8'b00000001; c_in = 1'b0; end
+                    5: begin a = 8'b11111111; b = 8'b00000001; c_in = 1'b1; end
+                    6: begin a = 8'b10101010; b = 8'b10101010; c_in = 1'b0; end
+                    7: begin a = 8'b10101010; b = 8'b10101010; c_in = 1'b1; end
+                endcase
+                
+                #10;
+                $display("  ARI  | %04b | %08b | %08b | %b || %08b | %b | %b", 
+                        s, a, b, c_in, f, a_eq_b, c_out);
+            end
+        end
+        
+        // Teste específico para demonstrar o ripple carry
+        $display("\n=== Teste de Ripple Carry ===");
+        m = 1'b0; // Modo aritmético
+        s = 4'b1001; // Soma A + B
+        c_in = 1'b0;
+        
+        // Teste que force carry entre as ULAs de 4 bits
+        a = 8'b00001111; // 15 decimal
+        b = 8'b00000001; // 1 decimal
+        #10;
+        $display("Soma sem carry: %08b + %08b = %08b (carry=%b)", a, b, f, c_out);
+        
+        a = 8'b11111111; // 255 decimal
+        b = 8'b00000001; // 1 decimal
+        #10;
+        $display("Soma com overflow: %08b + %08b = %08b (carry=%b)", a, b, f, c_out);
+        
+        $display("\n=== Teste de Comparação A=B (8 bits) ===");
+        m = 1'b1; // Modo lógico
+        s = 4'b0000;
+        
+        // Teste A=B para 8 bits
+        a = 8'b10101010;
+        b = 8'b10101010;
+        #10;
+        $display("A=%08b, B=%08b, A=B=%b (esperado: 1)", a, b, a_eq_b);
+        
+        b = 8'b10101011;
+        #10;
+        $display("A=%08b, B=%08b, A=B=%b (esperado: 0)", a, b, a_eq_b);
+        
+        $display("\n=== Simulação Concluída ===");
+        #100;
         $finish;
     end
 

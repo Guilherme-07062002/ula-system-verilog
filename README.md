@@ -9,12 +9,12 @@ O projeto é dividido em duas partes principais, cada uma com seu módulo de ULA
 ### Parte 1: ULA 74181 (4 bits)
 
   * `ula_74181.sv`: Contém a descrição em SystemVerilog da ULA 74181 de 4 bits, implementando as 16 operações lógicas e 16 operações aritméticas conforme especificado no datasheet original do componente.
-  * `tb_ula_74181.sv`: O *testbench* para a `ula_74181.sv`. Ele varre todas as 32 funções e aplica um conjunto significativo de vetores de teste para verificar o comportamento da ULA. Gera saída no terminal e um arquivo VCD (`ula_74181.vcd`) para análise de formas de onda.
+  * `tb_ula_74181.sv`: O *testbench* para a `ula_74181.sv`. Ele testa todas as 32 funções (16 lógicas + 16 aritméticas) aplicando vetores de teste abrangentes. Gera saída detalhada no terminal e um arquivo VCD (`ula_74181.vcd`) para análise de formas de onda.
 
 ### Parte 2: ULA de 8 bits
 
   * `ula_8_bits.sv`: Módulo principal que implementa uma ULA de 8 bits. Ele faz a **composição** de duas instâncias da `ula_74181.sv` utilizando o método **ripple carry** para conectar os bits menos significativos aos mais significativos.
-  * `tb_ula_8_bits.sv`: O *testbench* para a `ula_8_bits.sv`. Similar ao *testbench* de 4 bits, ele testa todas as funções com operandos de 8 bits, gerando saída no terminal e um arquivo VCD (`ula_8_bits.vcd`).
+  * `tb_ula_8_bits.sv`: O *testbench* para a `ula_8_bits.sv`. Testa todas as 32 funções com operandos de 8 bits, incluindo testes específicos para demonstrar o funcionamento do ripple carry e comparação de igualdade. Gera saída no terminal e um arquivo VCD (`ula_8_bits.vcd`).
 
 -----
 
@@ -64,6 +64,14 @@ Para simular o projeto, você precisará ter o **Icarus Verilog** e o **GTKWave*
 
 A ULA 74181 é um componente histórico fundamental em processadores. Ela é capaz de realizar 16 operações lógicas e 16 operações aritméticas com dois operandos de 4 bits, além de uma entrada de *carry* (`c_in`).
 
+**Operações Lógicas (M=1):**
+- NOT A, NOT(A OR B), (NOT A) AND B, 0, NOT(A AND B), NOT B, A XOR B, A AND (NOT B)
+- (NOT A) OR B, NOT(A XOR B), B, A AND B, 1, A OR (NOT B), A OR B, A
+
+**Operações Aritméticas (M=0):**
+- A, (A OR B), (A OR NOT B), -1, A+(A AND NOT B), (A OR B)+(A AND NOT B), A-B-1, (A AND NOT B)-1
+- A+(A AND B), A+B, (A OR NOT B)+(A AND B), (A AND B)-1, A+A, (A OR B)+A, (A OR NOT B)+A, A-1
+
   * **Entradas**:
       * `a`, `b`: Operandos de dados de 4 bits.
       * `s`: Entrada de seleção de função (4 bits).
@@ -87,5 +95,19 @@ A ULA de 8 bits é construída a partir de duas instâncias da `ula_74181.sv`. O
       * `f`: Saída principal da função (8 bits).
       * `a_eq_b`: Saída do comparador (ativa em nível alto quando `a == b`).
       * `c_out`: Saída de *carry* (Carry Out).
+
+## Testbenches
+
+Os testbenches implementados realizam testes abrangentes:
+
+- **tb_ula_74181.sv**: Testa todas as 32 funções da ULA 74181 com múltiplos vetores de teste, incluindo casos extremos (0000, 1111) e casos intermediários.
+
+- **tb_ula_8_bits.sv**: Testa todas as 32 funções com operandos de 8 bits, incluindo testes específicos para:
+  - Verificação do ripple carry entre as ULAs de 4 bits
+  - Operações com overflow
+  - Comparação de igualdade para 8 bits
+  - Padrões diversos (10101010, 11110000, etc.)
+
+Ambos os testbenches geram saída formatada no terminal e arquivos VCD para análise no GTKWave.
 
 -----
