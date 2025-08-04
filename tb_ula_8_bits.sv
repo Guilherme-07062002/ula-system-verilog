@@ -42,12 +42,12 @@ module tb_ula_8_bits;
         
         $display("\n=== MODO LÓGICO (M=1) - 8 bits ===");
         
-        for (fn = 0; fn < 16; fn = fn + 4) begin
+        for (fn = 0; fn < 16; fn = fn + 1) begin  // Alterado: testar todas as 16 funções
             s = fn[3:0];
             $display("\nFuncao S=%04b:", s);
             
             // Reduzindo número de casos de teste
-            for (i = 0; i < 3; i = i + 1) begin  // Apenas 3 casos de teste
+            for (i = 0; i < 3; i = i + 1) begin
                 case (i)
                     0: begin a = 8'h00; b = 8'h00; end
                     1: begin a = 8'hFF; b = 8'h00; end
@@ -63,14 +63,14 @@ module tb_ula_8_bits;
         // Teste das funções aritméticas (m = 0)
         m = 1'b0;
         
-        $display("\n=== MODO ARITMÉTICO (M=0) - 8 bits ===");
+        $display("\n=== MODO ARITMETICO (M=0) - 8 bits ===");
         
-        for (fn = 0; fn < 16; fn = fn + 4) begin
+        for (fn = 0; fn < 16; fn = fn + 1) begin  // Alterado: testar todas as 16 funções
             s = fn[3:0];
             $display("\nFuncao S=%04b:", s);
             
-            // Reduzindo número de casos de teste
-            for (i = 0; i < 4; i = i + 1) begin  // Apenas 4 casos de teste
+            // Casos de teste para funções aritméticas
+            for (i = 0; i < 4; i = i + 1) begin
                 case (i)
                     0: begin a = 8'h00; b = 8'h00; c_in = 1'b0; end
                     1: begin a = 8'h0F; b = 8'h01; c_in = 1'b0; end

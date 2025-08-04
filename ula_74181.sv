@@ -54,38 +54,22 @@ module ula_74181 (
     else begin
       // Modo aritmético: implementação correta conforme datasheet 74181
       case (s)
-        4'b0000: begin 
-          sum_arith = a + 4'b1111 + c_in;      // A - 1 + Cin (Minus 1 + Cin)
-          // Correção específica para o carry-out na função S=0000
-          if (c_in == 0) begin
-            if (a == 4'b0000 || a == 4'b0101) begin
-              c_out = 1'b0;
-            end else begin
-              c_out = 1'b1;
-            end
-          end else begin
-            if (a == 4'b1111) begin
-              c_out = 1'b1;
-            end else begin
-              c_out = 1'b0;
-            end
-          end
-        end
-        4'b0001: sum_arith = (a | b) + 4'b0000 + c_in;      // A OR B
-        4'b0010: sum_arith = (a | ~b) + 4'b0000 + c_in;     // A OR NOT B
-        4'b0011: sum_arith = 4'b1111 + 4'b0000 + c_in;      // Minus 1 (2's complement)
-        4'b0100: sum_arith = a + (a & ~b) + c_in;           // A PLUS (A AND NOT B)
-        4'b0101: sum_arith = (a | b) + (a & ~b) + c_in;     // (A OR B) PLUS (A AND NOT B)
-        4'b0110: sum_arith = a - b - 1 + c_in;              // A MINUS B MINUS 1 PLUS C_IN
-        4'b0111: sum_arith = (a & ~b) - 1 + c_in;           // (A AND NOT B) MINUS 1
-        4'b1000: sum_arith = a + a + c_in;                  // A PLUS A (2A)
-        4'b1001: sum_arith = a + (a | b) + c_in;            // A PLUS (A OR B)
-        4'b1010: sum_arith = a + (a | ~b) + c_in;           // A PLUS (A OR NOT B)
-        4'b1011: sum_arith = a - 1 + c_in;                  // A MINUS 1
-        4'b1100: sum_arith = a + (a & b) + c_in;            // A PLUS (A AND B)
-        4'b1101: sum_arith = (a | b) + (a & b) + c_in;      // (A OR B) PLUS (A AND B) = A PLUS B
-        4'b1110: sum_arith = (a | ~b) + (a & b) + c_in;     // (A OR NOT B) PLUS (A AND B)
-        4'b1111: sum_arith = a + c_in;                      // A
+        4'b0000: sum_arith = a + (~4'b0000) + c_in;       // A - 1 + Cin (A + ~0 + Cin)
+        4'b0001: sum_arith = a + b + c_in;                // A + B + Cin
+        4'b0010: sum_arith = a + (~b) + c_in;             // A + ~B + Cin
+        4'b0011: sum_arith = (~4'b0000) + c_in;           // -1 + Cin (Todos 1's + Cin)
+        4'b0100: sum_arith = a + (a & (~b)) + c_in;       // A + (A AND NOT B) + Cin
+        4'b0101: sum_arith = (a | b) + (a & (~b)) + c_in; // (A OR B) + (A AND NOT B) + Cin
+        4'b0110: sum_arith = a + (~b) + c_in;             // A - B - 1 + Cin = A + ~B + Cin
+        4'b0111: sum_arith = (a & (~b)) + (~4'b0000) + c_in; // (A AND NOT B) - 1 + Cin
+        4'b1000: sum_arith = a + a + c_in;                // A + A + Cin (2A + Cin)
+        4'b1001: sum_arith = a + (a | b) + c_in;          // A PLUS (A OR B)
+        4'b1010: sum_arith = a + (a | ~b) + c_in;         // A PLUS (A OR NOT B)
+        4'b1011: sum_arith = a - 1 + c_in;                // A MINUS 1
+        4'b1100: sum_arith = a + (a & b) + c_in;          // A PLUS (A AND B)
+        4'b1101: sum_arith = (a | b) + (a & b) + c_in;    // (A OR B) PLUS (A AND B) = A PLUS B
+        4'b1110: sum_arith = (a | ~b) + (a & b) + c_in;   // (A OR NOT B) PLUS (A AND B)
+        4'b1111: sum_arith = a + c_in;                    // A
         default: sum_arith = 5'bxxxxx;
       endcase
       
