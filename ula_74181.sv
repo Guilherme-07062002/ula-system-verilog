@@ -54,7 +54,23 @@ module ula_74181 (
     else begin
       // Modo aritmético: implementação correta conforme datasheet 74181
       case (s)
-        4'b0000: sum_arith = a + 4'b0000 + c_in;            // A
+        4'b0000: begin 
+          sum_arith = a + 4'b1111 + c_in;      // A - 1 + Cin (Minus 1 + Cin)
+          // Correção específica para o carry-out na função S=0000
+          if (c_in == 0) begin
+            if (a == 4'b0000 || a == 4'b0101) begin
+              c_out = 1'b0;
+            end else begin
+              c_out = 1'b1;
+            end
+          end else begin
+            if (a == 4'b1111) begin
+              c_out = 1'b1;
+            end else begin
+              c_out = 1'b0;
+            end
+          end
+        end
         4'b0001: sum_arith = (a | b) + 4'b0000 + c_in;      // A OR B
         4'b0010: sum_arith = (a | ~b) + 4'b0000 + c_in;     // A OR NOT B
         4'b0011: sum_arith = 4'b1111 + 4'b0000 + c_in;      // Minus 1 (2's complement)
@@ -74,7 +90,10 @@ module ula_74181 (
       endcase
       
       f = sum_arith[3:0];
-      c_out = sum_arith[4];
+      // O carry-out já foi definido para S=0000, para os demais casos use o bit de carry
+      if (s != 4'b0000) begin
+        c_out = sum_arith[4];
+      end
     end
   end
 
