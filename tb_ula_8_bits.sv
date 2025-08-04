@@ -65,9 +65,29 @@ module tb_ula_8_bits;
         
         $display("\n=== MODO ARITMETICO (M=0) - 8 bits ===");
         
-        for (fn = 0; fn < 16; fn = fn + 1) begin  // Alterado: testar todas as 16 funções
+        for (fn = 0; fn < 16; fn = fn + 1) begin
             s = fn[3:0];
-            $display("\nFuncao S=%04b:", s);
+            
+            // Corrigir descrições para corresponder às operações implementadas na ULA 74181
+            case (s)
+                4'b0000: $display("\nFuncao S=%04b: A MINUS 1 + Cin (A + ~0 + Cin)", s);
+                4'b0001: $display("\nFuncao S=%04b: A PLUS B + Cin (A + B + Cin)", s);
+                4'b0010: $display("\nFuncao S=%04b: A PLUS ~B + Cin (A - B - 1 + Cin)", s);
+                4'b0011: $display("\nFuncao S=%04b: MINUS 1 + Cin (~0 + Cin = -1 + Cin)", s);
+                4'b0100: $display("\nFuncao S=%04b: A PLUS (A AND ~B) + Cin", s);
+                4'b0101: $display("\nFuncao S=%04b: (A OR B) PLUS (A AND ~B) + Cin", s);
+                4'b0110: $display("\nFuncao S=%04b: A MINUS B MINUS 1 + Cin", s);
+                4'b0111: $display("\nFuncao S=%04b: (A AND ~B) MINUS 1 + Cin", s);
+                4'b1000: $display("\nFuncao S=%04b: A PLUS (A AND B) + Cin", s);
+                4'b1001: $display("\nFuncao S=%04b: A PLUS B + Cin (A + B + Cin)", s);
+                4'b1010: $display("\nFuncao S=%04b: (A OR ~B) PLUS (A AND B) + Cin", s);
+                4'b1011: $display("\nFuncao S=%04b: A MINUS 1 + Cin (A + ~0 + Cin)", s);
+                4'b1100: $display("\nFuncao S=%04b: A PLUS A + Cin (2A + Cin)", s);
+                4'b1101: $display("\nFuncao S=%04b: (A OR B) PLUS A + Cin", s);
+                4'b1110: $display("\nFuncao S=%04b: (A OR ~B) PLUS A + Cin", s);
+                4'b1111: $display("\nFuncao S=%04b: A MINUS 1 + Cin (A + ~0 + Cin)", s);
+                default: $display("\nFuncao S=%04b: Desconhecida", s);
+            endcase
             
             // Casos de teste para funções aritméticas
             for (i = 0; i < 4; i = i + 1) begin

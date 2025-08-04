@@ -52,32 +52,110 @@ module ula_74181 (
       f = logic_f;
     end
     else begin
-      // Modo aritmético: implementação correta conforme datasheet 74181
+      // Modo aritmético: implementação conforme datasheet 74181
       case (s)
-        4'b0000: sum_arith = a + (~4'b0000) + c_in;       // A - 1 + Cin (A + ~0 + Cin)
-        4'b0001: sum_arith = a + b + c_in;                // A + B + Cin
-        4'b0010: sum_arith = a + (~b) + c_in;             // A + ~B + Cin
-        4'b0011: sum_arith = (~4'b0000) + c_in;           // -1 + Cin (Todos 1's + Cin)
-        4'b0100: sum_arith = a + (a & (~b)) + c_in;       // A + (A AND NOT B) + Cin
-        4'b0101: sum_arith = (a | b) + (a & (~b)) + c_in; // (A OR B) + (A AND NOT B) + Cin
-        4'b0110: sum_arith = a + (~b) + c_in;             // A - B - 1 + Cin = A + ~B + Cin
-        4'b0111: sum_arith = (a & (~b)) + (~4'b0000) + c_in; // (A AND NOT B) - 1 + Cin
-        4'b1000: sum_arith = a + a + c_in;                // A + A + Cin (2A + Cin)
-        4'b1001: sum_arith = a + (a | b) + c_in;          // A PLUS (A OR B)
-        4'b1010: sum_arith = a + (a | ~b) + c_in;         // A PLUS (A OR NOT B)
-        4'b1011: sum_arith = a - 1 + c_in;                // A MINUS 1
-        4'b1100: sum_arith = a + (a & b) + c_in;          // A PLUS (A AND B)
-        4'b1101: sum_arith = (a | b) + (a & b) + c_in;    // (A OR B) PLUS (A AND B) = A PLUS B
-        4'b1110: sum_arith = (a | ~b) + (a & b) + c_in;   // (A OR NOT B) PLUS (A AND B)
-        4'b1111: sum_arith = a + c_in;                    // A
-        default: sum_arith = 5'bxxxxx;
+        4'b0000: begin
+            // F = A MINUS 1 (A + ~0 + Cin)
+            sum_arith = a + 4'b1111 + c_in;
+            f = sum_arith[3:0];
+            c_out = sum_arith[4];  // Removed inversion for consistency
+        end
+        4'b0001: begin
+            // F = A PLUS B
+            sum_arith = a + b + c_in;
+            f = sum_arith[3:0];
+            c_out = sum_arith[4];
+        end
+        4'b0010: begin
+            // F = A PLUS ~B (A - B - 1 + Cin)
+            sum_arith = a + (~b) + c_in;
+            f = sum_arith[3:0];
+            c_out = sum_arith[4];
+        end
+        4'b0011: begin
+            // F = MINUS 1 (0 + ~0 + Cin = 1111 + Cin)
+            sum_arith = 4'b0000 + 4'b1111 + c_in;
+            f = sum_arith[3:0];
+            c_out = sum_arith[4];
+        end
+        4'b0100: begin
+            // F = A PLUS (A AND ~B)
+            sum_arith = a + (a & (~b)) + c_in;
+            f = sum_arith[3:0];
+            c_out = sum_arith[4];
+        end
+        4'b0101: begin
+            // F = (A OR B) PLUS (A AND ~B)
+            sum_arith = (a | b) + (a & (~b)) + c_in;
+            f = sum_arith[3:0];
+            c_out = sum_arith[4];
+        end
+        4'b0110: begin
+            // F = A MINUS B MINUS 1 + Cin
+            sum_arith = a + (~b) + c_in;
+            f = sum_arith[3:0];
+            c_out = sum_arith[4];
+        end
+        4'b0111: begin
+            // F = (A AND ~B) MINUS 1 + Cin
+            sum_arith = (a & (~b)) + 4'b1111 + c_in;
+            f = sum_arith[3:0];
+            c_out = sum_arith[4];
+        end
+        4'b1000: begin
+            // F = A PLUS (A AND B)
+            sum_arith = a + (a & b) + c_in;
+            f = sum_arith[3:0];
+            c_out = sum_arith[4];
+        end
+        4'b1001: begin
+            // F = A PLUS B
+            sum_arith = a + b + c_in;
+            f = sum_arith[3:0];
+            c_out = sum_arith[4];
+        end
+        4'b1010: begin
+            // F = (A OR ~B) PLUS (A AND B)
+            sum_arith = (a | (~b)) + (a & b) + c_in;
+            f = sum_arith[3:0];
+            c_out = sum_arith[4];
+        end
+        4'b1011: begin
+            // F = A MINUS 1 + Cin (A + ~0 + Cin)
+            sum_arith = a + 4'b1111 + c_in;
+            f = sum_arith[3:0];
+            c_out = sum_arith[4];
+        end
+        4'b1100: begin
+            // F = A PLUS A (2A)
+            sum_arith = a + a + c_in;
+            f = sum_arith[3:0];
+            c_out = sum_arith[4];
+        end
+        4'b1101: begin
+            // F = (A OR B) PLUS A
+            sum_arith = (a | b) + a + c_in;
+            f = sum_arith[3:0];
+            c_out = sum_arith[4];
+        end
+        4'b1110: begin
+            // F = (A OR ~B) PLUS A
+            sum_arith = (a | (~b)) + a + c_in;
+            f = sum_arith[3:0];
+            c_out = sum_arith[4];
+        end
+        4'b1111: begin
+            // F = A MINUS 1 + Cin (A + ~0 + Cin)
+            sum_arith = a + 4'b1111 + c_in;
+            f = sum_arith[3:0];
+            c_out = sum_arith[4];
+        end
+        default: begin
+            sum_arith = 5'bxxxxx;
+            f = 4'bxxxx;
+            c_out = 1'bx;
+        end
       endcase
-      
-      f = sum_arith[3:0];
-      // O carry-out já foi definido para S=0000, para os demais casos use o bit de carry
-      if (s != 4'b0000) begin
-        c_out = sum_arith[4];
-      end
     end
   end
 
