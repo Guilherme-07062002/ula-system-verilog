@@ -42,12 +42,22 @@ Para simular o projeto, você precisará ter o **Icarus Verilog** e o **GTKWave*
 
 1.  **Compile o módulo e o testbench**:
     ```bash
+    # Método manual
     iverilog -g2012 -o sim/ula_74181.vvp rtl/ula_74181.sv tb/tb_ula_74181.sv
     ```
     
     Para o testbench completo baseado no datasheet:
     ```bash
     iverilog -g2012 -o sim/ula_74181_datasheet.vvp rtl/ula_74181.sv tb/tb_ula_74181_datasheet.sv
+    ```
+    
+    Ou use o script de build:
+    ```bash
+    # No Windows
+    .\build\build.bat
+    
+    # No Linux/macOS
+    ./build/build.sh
     ```
     
 2.  **Execute a simulação**:

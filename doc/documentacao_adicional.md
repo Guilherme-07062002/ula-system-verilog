@@ -145,23 +145,23 @@ Para executar qualquer um dos testbenches, use os seguintes comandos:
 
 ```bash
 # Para compilar o testbench da ULA de 4 bits
-iverilog -g2012 -o NOME_TESTBENCH.vvp ula_74181.sv NOME_TESTBENCH.sv
+iverilog -g2012 -o sim/NOME_TESTBENCH.vvp rtl/ula_74181.sv tb/NOME_TESTBENCH.sv
 
 # Para compilar o testbench da ULA de 8 bits
-iverilog -g2012 -o NOME_TESTBENCH.vvp ula_74181.sv ula_8_bits.sv NOME_TESTBENCH.sv
+iverilog -g2012 -o sim/NOME_TESTBENCH.vvp rtl/ula_74181.sv rtl/ula_8_bits.sv tb/NOME_TESTBENCH.sv
 
 # Para executar o testbench compilado
-vvp NOME_TESTBENCH.vvp
+vvp sim/NOME_TESTBENCH.vvp
 
 # Para visualizar as formas de onda geradas
-gtkwave NOME_TESTBENCH.vcd
+gtkwave sim/NOME_TESTBENCH.vcd
 ```
 
 Por exemplo, para executar o testbench mais completo da ULA de 4 bits:
 
 ```bash
-iverilog -g2012 -o ula_74181_datasheet.vvp ula_74181.sv tb_ula_74181_datasheet.sv
-vvp ula_74181_datasheet.vvp
+iverilog -g2012 -o sim/ula_74181_datasheet.vvp rtl/ula_74181.sv tb/tb_ula_74181_datasheet.sv
+vvp sim/ula_74181_datasheet.vvp
 ```
 
 Os resultados dos testes serão exibidos no terminal e os arquivos .vcd serão gerados para análise com GTKWave, se necessário.
