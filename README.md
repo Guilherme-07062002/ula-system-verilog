@@ -11,7 +11,7 @@ O projeto está organizado nas seguintes pastas:
 - **sim/**: Arquivos de simulação (scripts, waves)
 - **ip/**: Blocos reutilizáveis (IP cores)
 - **doc/**: Documentação (PDFs, Markdown, imagens)
-- **build/**: Geração automática (Makefile, outputs)
+- **build/**: Scripts de build automáticos (build.bat, build.sh)
 
 ### Códigos-fonte (pasta rtl/)
 
@@ -147,5 +147,35 @@ Os testbenches implementados realizam testes abrangentes:
   - Padrões diversos (10101010, 11110000, etc.)
 
 Ambos os testbenches geram saída formatada no terminal e arquivos VCD para análise no GTKWave.
+
+## Scripts de Build
+
+O projeto inclui scripts automatizados para compilar e executar todos os testbenches:
+
+- **build/build.bat**: Script para Windows
+- **build/build.sh**: Script para Linux/macOS
+
+Para executar todas as simulações de uma vez:
+
+```bash
+# No Windows
+cd build
+.\build.bat
+
+# No Linux/macOS
+cd build
+chmod +x build.sh  # Se necessário
+./build.sh
+```
+
+## Documentação Adicional
+
+Documentação detalhada está disponível na pasta `doc/`:
+
+- **doc/documentacao_adicional.md**: Detalhes gerais e funcionalidades das ULAs
+- **doc/arquitetura_tecnica.md**: Arquitetura técnica e considerações de design
+- **doc/guia_referencia_rapida.md**: Tabela de referência para todas as operações
+- **doc/guia_simulacao.md**: Instruções detalhadas para executar simulações
+- **doc/sinais_p_g_explicacao.md**: Explicação técnica dos sinais P e G
 
 -----
