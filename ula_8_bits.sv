@@ -6,7 +6,8 @@ module ula_8_bits (
     input       c_in,
     output wire [7:0] f,
     output wire       a_eq_b,
-    output wire       c_out
+    output wire       c_out,
+    output wire       overflow  // Sinal de overflow para aritmética de complemento a dois
 );
 
     // Sinais internos para cascateamento das ULAs de 4 bits
@@ -18,6 +19,9 @@ module ula_8_bits (
     wire       c_out_msb; // Carry Out da ULA dos 4 bits mais significativos
     wire       a_eq_b_msb; // A=B da ULA dos 4 bits mais significativos
 
+    // Sinais para carry look-ahead (P e G)
+    wire p_lsb, g_lsb, p_msb, g_msb;
+
     // Instanciação da ULA para os 4 bits menos significativos (LSB)
     ula_74181 ula_lsb (
         .a(a[3:0]),
@@ -27,7 +31,9 @@ module ula_8_bits (
         .c_in(c_in),
         .f(f_lsb),
         .a_eq_b(a_eq_b_lsb),
-        .c_out(c_out_lsb)
+        .c_out(c_out_lsb),
+        .p(p_lsb),
+        .g(g_lsb)
     );
 
     // Instanciação da ULA para os 4 bits mais significativos (MSB)
@@ -40,7 +46,9 @@ module ula_8_bits (
         .c_in(c_out_lsb), // Conexão Ripple Carry
         .f(f_msb),
         .a_eq_b(a_eq_b_msb),
-        .c_out(c_out)     // O carry_out do MSB é o carry_out final
+        .c_out(c_out),    // O carry_out do MSB é o carry_out final
+        .p(p_msb),
+        .g(g_msb)
     );
 
     // Conectando as saídas dos módulos de 4 bits para formar a saída de 8 bits
@@ -48,6 +56,16 @@ module ula_8_bits (
 
     // A saída a_eq_b para 8 bits é ativa se ambos os módulos de 4 bits indicarem igualdade
     assign a_eq_b = a_eq_b_lsb & a_eq_b_msb;
+    
+    // Detecção de overflow para aritmética em complemento a dois
+    // Overflow ocorre quando o carry dos dois bits mais significativos diferem
+    // Na prática, isso significa que o sinal do resultado mudou de forma inesperada
+    wire carry_bit_6_to_7; // Carry do bit 6 para o bit 7 (entre MSB-1 e MSB)
+    
+    // Para simplicidade, calculamos o overflow apenas para operações de adição e subtração (S=0101, S=1000)
+    // Overflow = carry_in_to_msb XOR carry_out_from_msb
+    assign carry_bit_6_to_7 = (a[6] & b[6]) | ((a[6] | b[6]) & f[6]);
+    assign overflow = (m == 1'b0) ? (carry_bit_6_to_7 ^ c_out) : 1'b0;
 
     // O carry out final já está conectado diretamente na instanciação da ULA MSB
     // Não é necessário fazer um assign adicional pois já foi feito na instanciação

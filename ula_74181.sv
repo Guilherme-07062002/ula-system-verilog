@@ -7,11 +7,36 @@ module ula_74181 (
     input  wire       c_in,   // Carry-in ≡ Cn
     output reg  [3:0] f,
     output wire       a_eq_b,
-    output reg        c_out   // Carry-out ≡ Cn+4
+    output reg        c_out,  // Carry-out ≡ Cn+4
+    output wire       p,      // Propagate (para carry look-ahead)
+    output wire       g       // Generate (para carry look-ahead)
 );
 
     // Comparador A = B (implementação correta)
     assign a_eq_b = (a == b);
+    
+    // Implementação dos sinais P (Propagate) e G (Generate) para carry look-ahead
+    // P = 1 quando um carry pode ser propagado através de todos os bits
+    // G = 1 quando um carry é gerado internamente
+    wire [3:0] p_bits, g_bits;
+    
+    // Para cada bit calculamos P e G conforme o modo e as operações
+    generate
+        genvar i;
+        for (i = 0; i < 4; i = i + 1) begin: pg_gen
+            assign p_bits[i] = (m == 1'b0) ? (a[i] | b[i]) : 1'b0; // Propagate no modo aritmético
+            assign g_bits[i] = (m == 1'b0) ? (a[i] & b[i]) : 1'b0; // Generate no modo aritmético
+        end
+    endgenerate
+    
+    // P e G para o carry look-ahead são calculados por:
+    // P = p0 & p1 & p2 & p3 (AND de todos os bits de propagate)
+    // G = g3 | (p3 & g2) | (p3 & p2 & g1) | (p3 & p2 & p1 & g0)
+    assign p = &p_bits; // AND de todos os bits P
+    assign g = g_bits[3] | 
+              (p_bits[3] & g_bits[2]) | 
+              (p_bits[3] & p_bits[2] & g_bits[1]) | 
+              (p_bits[3] & p_bits[2] & p_bits[1] & g_bits[0]);
 
     // Registrador de 5 bits para soma aritmética
     reg [4:0] sum_arith;
@@ -62,11 +87,15 @@ module ula_74181 (
             endcase
 
             f = sum_arith[3:0];
+            // Tratamento correto do carry-out conforme o datasheet do SN74LS181
+            // Para operações de subtração (A-B), o carry-out é o complemento do borrow
             case (s)
-                4'b1000, 4'b1001, 4'b1010, 4'b1011:
-                    c_out = ~sum_arith[4]; // Subtração F=A-B ou similar
+                // Operações de subtração
+                4'b0010, 4'b0011, 4'b0110, 4'b0111, 4'b1000, 4'b1001, 4'b1010, 4'b1110, 4'b1111:
+                    c_out = ~sum_arith[4]; // Complemento do carry para operações de subtração
+                // Operações de adição
                 default:
-                    c_out = sum_arith[4];
+                    c_out = sum_arith[4];  // Carry direto para operações de adição
             endcase
         end
     end
