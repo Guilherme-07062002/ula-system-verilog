@@ -28,12 +28,12 @@ module tb_ula_74181;
     integer i, j, k;
     
     initial begin
-        // Configuração para gerar arquivo VCD
-        $dumpfile("ula_74181.vcd");
+        // Configuração para gerar arquivo VCD na pasta sim/
+        $dumpfile("../sim/ula_74181.vcd");
         $dumpvars(0, tb_ula_74181);
         
         $display("=== Testbench ULA 74181 ===");
-        $display("Testando todas as funções com validação dos sinais P e G");
+        $display("Testando todas as funcoes com validacao dos sinais P e G");
         $display("Formato: Modo | S | A | B | Cin || F | A=B | Cout | P | G");
         $display("--------------------------------------------------------");
         
@@ -82,9 +82,9 @@ module tb_ula_74181;
         b = 4'b1111;
         #10;
         $display("Caso P=0, G=1: A=%04b, B=%04b => P=%b, G=%b (esperado: P=0, G=1)", a, b, p, g);
-        
+
         // Caso 3: Verificação do carry-out com base em P e G
-        $display("\n=== Verificação do carry out com Cin=1 ===");
+        $display("\n=== Verificacao do carry out com Cin=1 ===");
         c_in = 1'b1;
         a = 4'b0101;
         b = 4'b1010;

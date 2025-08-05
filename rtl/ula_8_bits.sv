@@ -7,7 +7,9 @@ module ula_8_bits (
     output wire [7:0] f,
     output wire       a_eq_b,
     output wire       c_out,
-    output wire       overflow  // Sinal de overflow para aritmética de complemento a dois
+    output wire       overflow,  // Sinal de overflow para aritmética de complemento a dois
+    output wire       p,         // Propagação de carry para toda a ULA de 8 bits
+    output wire       g          // Geração de carry para toda a ULA de 8 bits
 );
 
     // Sinais internos para cascateamento das ULAs de 4 bits
@@ -58,16 +60,34 @@ module ula_8_bits (
     assign a_eq_b = a_eq_b_lsb & a_eq_b_msb;
     
     // Detecção de overflow para aritmética em complemento a dois
-    // Overflow ocorre quando o carry dos dois bits mais significativos diferem
-    // Na prática, isso significa que o sinal do resultado mudou de forma inesperada
-    wire carry_bit_6_to_7; // Carry do bit 6 para o bit 7 (entre MSB-1 e MSB)
+    // Overflow ocorre quando o resultado tem sinal diferente do esperado
+    // Isto é, quando os sinais dos operandos são iguais mas o sinal do resultado é diferente (para adição)
+    // ou quando os sinais dos operandos são diferentes e o sinal do resultado é igual ao subtraendo (para subtração)
     
-    // Para simplicidade, calculamos o overflow apenas para operações de adição e subtração (S=0101, S=1000)
-    // Overflow = carry_in_to_msb XOR carry_out_from_msb
-    assign carry_bit_6_to_7 = (a[6] & b[6]) | ((a[6] | b[6]) & f[6]);
-    assign overflow = (m == 1'b0) ? (carry_bit_6_to_7 ^ c_out) : 1'b0;
+    wire is_add, is_sub;
+    
+    // Identificamos as operações de adição (S=1001) e subtração (S=0110)
+    assign is_add = (m == 1'b0) && (s == 4'b1001);
+    assign is_sub = (m == 1'b0) && (s == 4'b0110);
+    
+    // Para adição: overflow quando os sinais dos operandos são iguais e diferentes do resultado
+    wire add_overflow = is_add && (a[7] == b[7]) && (a[7] != f[7]);
+    
+    // Para subtração: overflow quando os sinais dos operandos são diferentes e o resultado tem o mesmo sinal do subtraendo
+    wire sub_overflow = is_sub && (a[7] != b[7]) && (f[7] == b[7]);
+    
+    // Overflow ocorre apenas em adição ou subtração
+    assign overflow = (m == 1'b0) ? (add_overflow || sub_overflow) : 1'b0;
 
     // O carry out final já está conectado diretamente na instanciação da ULA MSB
     // Não é necessário fazer um assign adicional pois já foi feito na instanciação
+    
+    // Para os sinais de carry look-ahead P e G para a ULA de 8 bits completa
+    // P para 8 bits é ativo se ambos P dos 4 bits estiverem ativos
+    assign p = p_lsb & p_msb;
+    
+    // G para 8 bits - considera o cascateamento do carry
+    // G8 = G_msb + (P_msb & G_lsb)
+    assign g = g_msb | (p_msb & g_lsb);
 
 endmodule
