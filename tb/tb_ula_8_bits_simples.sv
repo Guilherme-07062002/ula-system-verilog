@@ -28,8 +28,8 @@ module tb_ula_8_bits_simples;
     );
     
     initial begin
-        // Configuração para gerar arquivo VCD
-        $dumpfile("ula_8_bits_simples.vcd");
+        // Configuração para gerar arquivo VCD na pasta sim/
+        $dumpfile("../sim/ula_8_bits_simples.vcd");
         $dumpvars(0, tb_ula_8_bits_simples);
         
         $display("=== Testando ULA de 8 bits - Casos Importantes ===");

@@ -217,8 +217,8 @@ module tb_ula_74181_datasheet;
     endtask
     
     initial begin
-        // Configuração para gerar arquivo VCD
-        $dumpfile("ula_74181_datasheet.vcd");
+        // Configuração para gerar arquivo VCD na pasta sim/
+        $dumpfile("../sim/ula_74181_datasheet.vcd");
         $dumpvars(0, tb_ula_74181_datasheet);
         
         $display("=== Testbench de Validacao Completa da ULA 74181 ===");

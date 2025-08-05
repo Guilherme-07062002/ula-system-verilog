@@ -28,8 +28,8 @@ module tb_ula_74181;
     integer i, j, k;
     
     initial begin
-        // Configuração para gerar arquivo VCD
-        $dumpfile("ula_74181.vcd");
+        // Configuração para gerar arquivo VCD na pasta sim/
+        $dumpfile("../sim/ula_74181.vcd");
         $dumpvars(0, tb_ula_74181);
         
         $display("=== Testbench ULA 74181 ===");

@@ -155,7 +155,7 @@ module tb_ula_8_bits_final;
     
     // Teste principal
     initial begin
-        $dumpfile("ula_8_bits_final.vcd");
+        $dumpfile("../sim/ula_8_bits_final.vcd");
         $dumpvars(0, tb_ula_8_bits_final);
         
         $display("=== Testbench Final da ULA de 8 bits ===");
