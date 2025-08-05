@@ -185,7 +185,7 @@ module tb_ula_8_bits_datasheet;
     // Testes especiais para verificar o ripple carry
     task test_ripple_carry;
         begin
-            $display("\n=== Testando Ripple Carry ===");
+            $display("\n=== Testando Ripple Carry ==="); // 'ç' removido
             
             // Adição de dois números de 8 bits que gera carry
             m = 0; // Modo aritmético
@@ -220,7 +220,7 @@ module tb_ula_8_bits_datasheet;
         $dumpfile("../sim/ula_8_bits_datasheet.vcd");
         $dumpvars(0, tb_ula_8_bits_datasheet);
         
-        $display("=== Testbench de Validação da ULA de 8 bits ===");
+        $display("=== Testbench de Validacao da ULA de 8 bits ==="); // 'ç' -> 'c', 'ã' -> 'a'
         
         errors = 0;
         total_tests = 0;
@@ -228,11 +228,11 @@ module tb_ula_8_bits_datasheet;
         // Testamos cada função com diferentes valores de entradas
         for (int mode = 0; mode <= 1; mode = mode + 1) begin
             m = mode;
-            $display("\n=== MODO %s (M=%0d) ===", (m == 0) ? "ARITMETICO" : "LOGICO", m);
+            $display("\n=== MODO %s (M=%0d) ===", (m == 0) ? "ARITMETICO" : "LOGICO", m); // sem acento
             
             for (int func = 0; func < 16; func = func + 1) begin
                 s = func[3:0];
-                $display("Função S=%04b:", s);
+                $display("Funcao S=%04b:", s); // 'ç' -> 'c', 'ã' -> 'a'
                 
                 for (int cin_val = 0; cin_val <= 1; cin_val = cin_val + 1) begin
                     c_in = cin_val;
@@ -254,12 +254,12 @@ module tb_ula_8_bits_datasheet;
         
         // Exibimos o resultado final
         if (errors == 0) begin
-            $display("\n=== TODOS OS TESTES PASSARAM! (%0d testes) ===", total_tests);
+            $display("\n=== TODOS OS TESTES PASSARAM! (%0d testes) ===", total_tests); // 'ç' -> 'c', 'ã' -> 'a'
         end else begin
-            $display("\n=== %0d ERROS em %0d testes! ===", errors, total_tests);
+            $display("\n=== %0d ERROS em %0d testes! ===", errors, total_tests); // 'ç' -> 'c', 'ã' -> 'a'
         end
         
-        $display("\n=== Simulação Concluída ===");
+        $display("\n=== Simulacao Concluida ==="); // 'ç' -> 'c', 'ã' -> 'a', 'ú' -> 'u'
         #100;
         $finish;
     end

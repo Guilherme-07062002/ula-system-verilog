@@ -33,7 +33,7 @@ module tb_ula_74181;
         $dumpvars(0, tb_ula_74181);
         
         $display("=== Testbench ULA 74181 ===");
-        $display("Testando todas as funções com validação dos sinais P e G");
+        $display("Testando todas as funcoes com validacao dos sinais P e G");
         $display("Formato: Modo | S | A | B | Cin || F | A=B | Cout | P | G");
         $display("--------------------------------------------------------");
         

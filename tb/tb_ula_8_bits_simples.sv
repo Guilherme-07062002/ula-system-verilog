@@ -51,27 +51,27 @@ module tb_ula_8_bits_simples;
         a = 8'h05;
         b = 8'h03;
         #10;
-        $display("Adição: %d + %d = %d, Cout=%b, Overflow=%b", a, b, f, c_out, overflow);
+        $display("Adicao: %d + %d = %d, Cout=%b, Overflow=%b", a, b, f, c_out, overflow);
         
         // 127 + 1 = 128 (teste de overflow positivo)
         a = 8'h7F;
         b = 8'h01;
         #10;
-        $display("Adição com overflow positivo: %d + %d = %d, Cout=%b, Overflow=%b", 
+        $display("Adicao com overflow positivo: %d + %d = %d, Cout=%b, Overflow=%b", 
                  $signed(a), $signed(b), $signed(f), c_out, overflow);
                  
         // 128 + 127 = 255 (outro teste de overflow)
         a = 8'h80;
         b = 8'h7F;
         #10;
-        $display("Adição com overflow: %d + %d = %d, Cout=%b, Overflow=%b", 
+        $display("Adicao com overflow: %d + %d = %d, Cout=%b, Overflow=%b", 
                  $signed(a), $signed(b), $signed(f), c_out, overflow);
         
         // 255 + 1 = 0 (com carry)
         a = 8'hFF;
         b = 8'h01;
         #10;
-        $display("Adição com carry: %d + %d = %d, Cout=%b, Overflow=%b", 
+        $display("Adicao com carry: %d + %d = %d, Cout=%b, Overflow=%b", 
                  a, b, f, c_out, overflow);
         
         // Test Case 2: Subtração (A - B - 1 + Cin)
@@ -83,21 +83,21 @@ module tb_ula_8_bits_simples;
         a = 8'h0A;
         b = 8'h05;
         #10;
-        $display("\nSubtração: %d - %d = %d, Cout=%b, Overflow=%b", 
+        $display("\nSubtracao: %d - %d = %d, Cout=%b, Overflow=%b", 
                  a, b, f, c_out, overflow);
         
         // 0 - 1 = -1
         a = 8'h00;
         b = 8'h01;
         #10;
-        $display("Subtração: %d - %d = %d, Cout=%b, Overflow=%b", 
+        $display("Subtracao: %d - %d = %d, Cout=%b, Overflow=%b", 
                  a, b, $signed(f), c_out, overflow);
         
         // -128 - 1 = 127 (overflow)
         a = 8'h80;
         b = 8'h01;
         #10;
-        $display("Subtração com overflow: %d - %d = %d, Cout=%b, Overflow=%b", 
+        $display("Subtracao com overflow: %d - %d = %d, Cout=%b, Overflow=%b", 
                  $signed(a), $signed(b), $signed(f), c_out, overflow);
         
         // Test Case 3: Operação Lógica (AND)
@@ -108,7 +108,7 @@ module tb_ula_8_bits_simples;
         a = 8'hAA;
         b = 8'h55;
         #10;
-        $display("\nOperação AND: 0x%h AND 0x%h = 0x%h", a, b, f);
+        $display("\nOperacao AND: 0x%h AND 0x%h = 0x%h", a, b, f);
         
         // Test Case 4: Operação Lógica (OR)
         m = 1;         // Modo lógico
@@ -117,7 +117,7 @@ module tb_ula_8_bits_simples;
         a = 8'hAA;
         b = 8'h55;
         #10;
-        $display("Operação OR: 0x%h OR 0x%h = 0x%h", a, b, f);
+        $display("Operacao OR: 0x%h OR 0x%h = 0x%h", a, b, f);
         
         // Test Case 5: Operação Lógica (XOR)
         m = 1;         // Modo lógico
@@ -126,7 +126,7 @@ module tb_ula_8_bits_simples;
         a = 8'hAA;
         b = 8'h55;
         #10;
-        $display("Operação XOR: 0x%h XOR 0x%h = 0x%h", a, b, f);
+        $display("Operacao XOR: 0x%h XOR 0x%h = 0x%h", a, b, f);
         
         // Test Case 6: Teste de igualdade
         m = 1;         // Modo lógico
@@ -161,7 +161,7 @@ module tb_ula_8_bits_simples;
         #10;
         $display("Teste de Carry Look-ahead: A=%h, B=%h, P=%b, G=%b", a, b, p, g);
         
-        $display("\n=== Simulação Concluída ===");
+        $display("\n=== Simulacao Concluida ===");
         #100;
         $finish;
     end
