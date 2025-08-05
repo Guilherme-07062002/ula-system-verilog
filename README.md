@@ -4,17 +4,33 @@ Este repositório apresenta a implementação e simulação de uma **Unidade Ló
 
 ## Estrutura do Projeto
 
-O projeto é dividido em duas partes principais, cada uma com seu módulo de ULA e seu respectivo *testbench*.
+O projeto está organizado nas seguintes pastas:
 
-### Parte 1: ULA 74181 (4 bits)
+- **rtl/**: Códigos-fonte HDL
+- **tb/**: Testbenches
+- **sim/**: Arquivos de simulação (scripts, waves)
+- **ip/**: Blocos reutilizáveis (IP cores)
+- **doc/**: Documentação (PDFs, Markdown, imagens)
+- **build/**: Geração automática (Makefile, outputs)
 
-  * `ula_74181.sv`: Contém a descrição em SystemVerilog da ULA 74181 de 4 bits, implementando as 16 operações lógicas e 16 operações aritméticas conforme especificado no datasheet original do componente.
-  * `tb_ula_74181.sv`: O *testbench* para a `ula_74181.sv`. Ele testa todas as 32 funções (16 lógicas + 16 aritméticas) aplicando vetores de teste abrangentes. Gera saída detalhada no terminal e um arquivo VCD (`ula_74181.vcd`) para análise de formas de onda.
+### Códigos-fonte (pasta rtl/)
 
-### Parte 2: ULA de 8 bits
+  * `rtl/ula_74181.sv`: Contém a descrição em SystemVerilog da ULA 74181 de 4 bits, implementando as 16 operações lógicas e 16 operações aritméticas conforme especificado no datasheet original do componente.
+  * `rtl/ula_8_bits.sv`: Módulo principal que implementa uma ULA de 8 bits. Ele faz a **composição** de duas instâncias da `ula_74181.sv` utilizando o método **ripple carry** para conectar os bits menos significativos aos mais significativos.
 
-  * `ula_8_bits.sv`: Módulo principal que implementa uma ULA de 8 bits. Ele faz a **composição** de duas instâncias da `ula_74181.sv` utilizando o método **ripple carry** para conectar os bits menos significativos aos mais significativos.
-  * `tb_ula_8_bits.sv`: O *testbench* para a `ula_8_bits.sv`. Testa todas as 32 funções com operandos de 8 bits, incluindo testes específicos para demonstrar o funcionamento do ripple carry e comparação de igualdade. Gera saída no terminal e um arquivo VCD (`ula_8_bits.vcd`).
+### Testbenches (pasta tb/)
+
+  * `tb/tb_ula_74181.sv`: Testbench básico para a ULA 74181.
+  * `tb/tb_ula_74181_datasheet.sv`: Testbench completo que valida todas as 32 funções contra as especificações do datasheet.
+  * `tb/tb_ula_8_bits.sv`: Testbench básico para a ULA de 8 bits.
+  * `tb/tb_ula_8_bits_datasheet.sv`: Testbench abrangente para ULA de 8 bits.
+  * `tb/tb_ula_8_bits_final.sv`: Testbench com 100% de cobertura para a ULA de 8 bits.
+  * `tb/tb_ula_8_bits_simples.sv`: Testbench simples para testes rápidos.
+
+### Arquivos de simulação (pasta sim/)
+
+  * Arquivos VCD para análise de formas de onda
+  * Arquivos VVP compilados para execução das simulações
 
 -----
 
@@ -26,34 +42,56 @@ Para simular o projeto, você precisará ter o **Icarus Verilog** e o **GTKWave*
 
 1.  **Compile o módulo e o testbench**:
     ```bash
-    iverilog -g2012 -o ula_74181.vvp ula_74181.sv tb_ula_74181.sv
+    iverilog -g2012 -o sim/ula_74181.vvp rtl/ula_74181.sv tb/tb_ula_74181.sv
     ```
+    
+    Para o testbench completo baseado no datasheet:
+    ```bash
+    iverilog -g2012 -o sim/ula_74181_datasheet.vvp rtl/ula_74181.sv tb/tb_ula_74181_datasheet.sv
+    ```
+    
 2.  **Execute a simulação**:
     ```bash
-    vvp ula_74181.vvp
+    vvp sim/ula_74181.vvp
     ```
-    Isso imprimirá os resultados da simulação no terminal e gerará o arquivo `ula_74181.vcd`.
+    ou
+    ```bash
+    vvp sim/ula_74181_datasheet.vvp
+    ```
+    
+    Isso imprimirá os resultados da simulação no terminal e gerará o arquivo VCD na pasta `sim/`.
+    
 3.  **Visualize as formas de onda**:
     ```bash
-    gtkwave ula_74181.vcd
+    gtkwave sim/ula_74181.vcd
     ```
 
 ### Simulação da ULA de 8 bits
 
 1.  **Compile os módulos e o testbench**:
       * Note que o módulo `ula_8_bits.sv` instancia `ula_74181.sv`, portanto, ambos devem ser incluídos na compilação.
-    <!-- end list -->
+    
     ```bash
-    iverilog -g2012 -o ula_8_bits.vvp ula_74181.sv ula_8_bits.sv tb_ula_8_bits.sv
+    iverilog -g2012 -o sim/ula_8_bits.vvp rtl/ula_74181.sv rtl/ula_8_bits.sv tb/tb_ula_8_bits.sv
     ```
+    
+    Para o testbench com 100% de cobertura:
+    ```bash
+    iverilog -g2012 -o sim/ula_8_bits_final.vvp rtl/ula_74181.sv rtl/ula_8_bits.sv tb/tb_ula_8_bits_final.sv
+    ```
+    
 2.  **Execute a simulação**:
     ```bash
-    vvp ula_8_bits.vvp
+    vvp sim/ula_8_bits.vvp
     ```
-    Isso imprimirá os resultados da simulação no terminal e gerará o arquivo `ula_8_bits.vcd`.
+    ou
+    ```bash
+    vvp sim/ula_8_bits_final.vvp
+    ```
+    
 3.  **Visualize as formas de onda**:
     ```bash
-    gtkwave ula_8_bits.vcd
+    gtkwave sim/ula_8_bits.vcd
     ```
 
 -----
