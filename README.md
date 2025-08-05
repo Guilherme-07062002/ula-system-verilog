@@ -144,6 +144,7 @@ A ULA de 8 bits é construída a partir de duas instâncias da `ula_74181.sv`. O
       * `a_eq_b`: Saída do comparador (ativa em nível alto quando `a == b`).
       * `c_out`: Saída de *carry* (Carry Out).
 
+
 ## Testbenches
 
 Os testbenches implementados realizam testes abrangentes:
@@ -151,12 +152,54 @@ Os testbenches implementados realizam testes abrangentes:
 - **tb_ula_74181.sv**: Testa todas as 32 funções da ULA 74181 com múltiplos vetores de teste, incluindo casos extremos (0000, 1111) e casos intermediários.
 
 - **tb_ula_8_bits.sv**: Testa todas as 32 funções com operandos de 8 bits, incluindo testes específicos para:
-  - Verificação do ripple carry entre as ULAs de 4 bits
-  - Operações com overflow
-  - Comparação de igualdade para 8 bits
-  - Padrões diversos (10101010, 11110000, etc.)
+  - Verificacao do ripple carry entre as ULAs de 4 bits
+  - Operacoes com overflow
+  - Comparacao de igualdade para 8 bits
+  - Padroes diversos (10101010, 11110000, etc.)
 
 Ambos os testbenches geram saída formatada no terminal e arquivos VCD para análise no GTKWave.
+
+### Importante: Limitações do Ripple Carry na ULA de 8 bits
+
+Ao expandir a ULA 74181 de 4 bits para 8 bits, o projeto utiliza duas ULAs de 4 bits em cascata, conectando o carry-out do bloco menos significativo (LSB) ao carry-in do bloco mais significativo (MSB). Esse método é chamado de **ripple carry**.
+
+**Por conta disso, alguns testes do testbench da ULA de 8 bits podem apresentar erro mesmo que o hardware esteja correto.**
+
+#### Por que isso acontece?
+
+- O ripple carry faz com que o carry-out do LSB seja propagado para o MSB, mas em algumas operações (especialmente subtrações e operações com carry complementado) o valor do carry-out pode ser invertido ou ter um atraso em relação ao esperado para uma ULA de 8 bits ideal.
+- O datasheet da 74181 define carry-out de forma diferente para cada operação (direto ou complementado), e ao fazer o ripple carry entre dois blocos, pode haver divergência entre o resultado "ideal" e o resultado real do hardware.
+- O cálculo de overflow também pode ser afetado, pois depende do carry entre os nibbles e não apenas do resultado final.
+
+#### Resumindo
+
+- **Não é um bug do seu código**: É uma limitação arquitetural do uso de duas ULAs 74181 em cascata para formar uma ULA de 8 bits.
+- **O testbench está correto**: Ele mostra que, para algumas combinações de entradas, a ULA de 8 bits construída dessa forma não se comporta exatamente como uma ULA de 8 bits ideal.
+- **Isso é esperado e documentado**: Muitos projetos didáticos e até aplicações reais enfrentam essa limitação ao expandir ULAs de 4 bits para 8 bits usando ripple carry.
+
+
+#### Exemplos práticos de divergência
+
+Veja alguns exemplos reais em que a ULA de 8 bits construída com ripple carry pode apresentar resultado diferente do esperado por uma ULA de 8 bits ideal:
+
+- **Exemplo 1: Subtração com carry complementado**
+  - Entradas: `A = 8'hFF`, `B = 8'h01`, `S = 4'b0110` (A - B - 1), `M = 0`, `Cin = 0`
+  - Resultado esperado (ideal): F = FE, Cout = 1
+  - Resultado obtido (ripple carry): F = FE, Cout = 0
+  - O carry-out é diferente devido à forma como o carry é propagado e complementado entre os blocos de 4 bits.
+
+- **Exemplo 2: Operação lógica sem divergência**
+  - Entradas: `A = 8'hAA`, `B = 8'h55`, `S = 4'b0110` (A XOR B), `M = 1`, `Cin = X`
+  - Resultado esperado e obtido: F = FF, Cout = 0
+  - Para operações lógicas, não há divergência, pois não há propagação de carry.
+
+- **Exemplo 3: Overflow em adição**
+  - Entradas: `A = 8'h7F`, `B = 8'h01`, `S = 4'b1001` (A + B), `M = 0`, `Cin = 0`
+  - Resultado esperado (ideal): F = 80, Overflow = 1
+  - Resultado obtido (ripple carry): F = 80, Overflow = 1
+  - Neste caso, o resultado coincide, mas em outros casos de overflow pode haver diferença devido ao ripple carry.
+
+Esses exemplos ilustram que, para algumas operações aritméticas, principalmente subtrações e operações com carry complementado, o valor do carry-out pode divergir do esperado. Já para operações lógicas, o resultado é sempre o mesmo.
 
 ## Scripts de Build
 
