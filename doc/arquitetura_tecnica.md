@@ -1,5 +1,7 @@
 # Arquitetura Técnica da ULA 74181 e ULA 8 bits
 
+Link para o datasheet: [ULA 74181 Datasheet](https://www.ti.com/lit/ds/symlink/sn54ls181.pdf)
+
 Este documento apresenta detalhes técnicos sobre a implementação da ULA 74181 e da ULA de 8 bits, incluindo diagramas de blocos, fluxo de sinais e considerações de design.
 
 ## Arquitetura da ULA 74181 (4 bits)
