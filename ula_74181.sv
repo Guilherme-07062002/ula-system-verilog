@@ -121,8 +121,8 @@ module ula_74181 (
             c_out = sum_arith[4];
         end
         4'b1011: begin
-            // F = A MINUS 1 + Cin
-            sum_arith = a + (-1) + c_in;  // Usando notação de número negativo
+            // F = (A AND B) MINUS 1 + Cin - Corrigido conforme o datasheet
+            sum_arith = (a & b) + (-1) + c_in;  // (A AND B) MINUS 1 + Cin
             f = sum_arith[3:0];
             c_out = sum_arith[4];
         end
