@@ -111,21 +111,25 @@ module tb_ula_8_bits;
         // Mantendo apenas os testes essenciais de ripple carry e comparação
         $display("\n=== Teste de Ripple Carry ===");
         m = 1'b0; // Modo aritmético
-        s = 4'b1001; // Soma A + B
+        s = 4'b0101; // Soma A + B (função direta de soma)
         c_in = 1'b0;
-        
+
         // Teste que force carry entre as ULAs de 4 bits
         a = 8'b00001111; // 15 decimal
         b = 8'b00000001; // 1 decimal
         #10;
-        $display("Soma sem carry: %08b + %08b = %08b (carry=%b)", a, b, f, c_out);
-        
+        $display("Soma sem overflow: %08b + %08b = %08b (carry=%b) - Esperado: 00010000", a, b, f, c_out);     
+
         a = 8'b11111111; // 255 decimal
         b = 8'b00000001; // 1 decimal
         #10;
-        $display("Soma com overflow: %08b + %08b = %08b (carry=%b)", a, b, f, c_out);
-        
-        $display("\n=== Teste de Comparacao A=B (8 bits) ===");
+        $display("Soma com overflow: %08b + %08b = %08b (carry=%b) - Esperado: 00000000 com carry=1", a, b, f, c_out);  
+
+        // Teste de propagação de carry através das ULAs
+        a = 8'b00001111; // 15 decimal - todos os bits LSB em 1
+        b = 8'b00010000; // 16 decimal - primeiro bit MSB em 1
+        #10;
+        $display("Propagação de carry: %08b + %08b = %08b (carry=%b) - Esperado: 00011111", a, b, f, c_out);        $display("\n=== Teste de Comparacao A=B (8 bits) ===");
         m = 1'b1; // Modo lógico
         s = 4'b0000;
         

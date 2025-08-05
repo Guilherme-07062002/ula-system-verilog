@@ -47,9 +47,9 @@ module ula_74181 (
                 4'b0010: sum_arith = {1'b0, a} + {1'b0, a|~b}; // F = A + (A|~B)
                 4'b0011: sum_arith = {1'b0, a} + {1'b0, 4'b1111}; // F = A + (-1)
                 4'b0100: sum_arith = {1'b0, a} + {1'b0, a&b}; // F = A + (A&B)
-                4'b0101: sum_arith = {1'b0, a} + {1'b0, b}; // F = A + B
-                4'b0110: sum_arith = {1'b0, a} + {1'b0, b}; // F = A + B
-                4'b0111: sum_arith = {1'b0, a} + {1'b0, a}; // F = A + A
+                4'b0101: sum_arith = {1'b0, a} + {1'b0, b} + c_in; // F = A + B + Cin
+                4'b0110: sum_arith = {1'b0, a} + {1'b0, b} + c_in; // F = A + B + Cin
+                4'b0111: sum_arith = {1'b0, a} + {1'b0, a} + c_in; // F = A + A + Cin
                 4'b1000: sum_arith = {1'b0, a} + {1'b0, ~b} + c_in; // F = A + ~B + C_in
                 4'b1001: sum_arith = {1'b0, a&b} + {1'b0, ~b} + c_in; // F = (A&B) + ~B + C_in
                 4'b1010: sum_arith = {1'b0, a&~b} + {1'b0, ~b} + c_in; // F = (A&~B) + ~B + C_in
