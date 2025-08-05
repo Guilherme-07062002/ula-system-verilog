@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module tb_ula_8_bits_completo;
+module tb_ula_8_bits;
 
     // Sinais de entrada
     reg [7:0] a, b;
@@ -26,10 +26,10 @@ module tb_ula_8_bits_completo;
     
     initial begin
         // Configuração para gerar arquivo VCD
-        $dumpfile("ula_8_bits_completo.vcd");
-        $dumpvars(0, tb_ula_8_bits_completo);
+        $dumpfile("ula_8_bits.vcd");
+        $dumpvars(0, tb_ula_8_bits);
         
-        $display("=== Testbench ULA 8 bits Completo ===");
+        $display("=== Testbench ULA 8 bits ===");
         $display("Testando operações específicas para verificar overflow e cascateamento");
         $display("Formato: Modo | S | A | B | Cin || F | A=B | Cout | Overflow");
         

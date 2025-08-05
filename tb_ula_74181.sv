@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module tb_ula_74181_completo;
+module tb_ula_74181;
 
     // Sinais de entrada
     reg [3:0] a, b, s;
@@ -29,10 +29,10 @@ module tb_ula_74181_completo;
     
     initial begin
         // Configuração para gerar arquivo VCD
-        $dumpfile("ula_74181_completo.vcd");
-        $dumpvars(0, tb_ula_74181_completo);
+        $dumpfile("ula_74181.vcd");
+        $dumpvars(0, tb_ula_74181);
         
-        $display("=== Testbench ULA 74181 Completo ===");
+        $display("=== Testbench ULA 74181 ===");
         $display("Testando todas as funções com validação dos sinais P e G");
         $display("Formato: Modo | S | A | B | Cin || F | A=B | Cout | P | G");
         $display("--------------------------------------------------------");
