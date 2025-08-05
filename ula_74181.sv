@@ -16,27 +16,63 @@ module ula_74181 (
     assign a_eq_b = (a == b);
     
     // Implementação dos sinais P (Propagate) e G (Generate) para carry look-ahead
-    // P = 1 quando um carry pode ser propagado através de todos os bits
-    // G = 1 quando um carry é gerado internamente
-    wire [3:0] p_bits, g_bits;
+    // De acordo com o datasheet SN74LS181:
+    // - No modo aritmético (M=0), P e G dependem das funções selecionadas por S
+    // - No modo lógico (M=1), P=0 e G=1 (para desabilitar carry look-ahead)
     
-    // Para cada bit calculamos P e G conforme o modo e as operações
+    // Sinais intermediários para cada bit
+    wire [3:0] p_bits, g_bits;
+    reg [3:0] op_result; // Resultado intermediário baseado nas seleções S
+    
+    // Cálculo dos operandos para P e G de acordo com S
+    always @* begin
+        if (m == 1'b0) begin // Modo aritmético
+            case (s)
+                // Para cada código S, calculamos os operandos conforme o datasheet
+                4'b0000: op_result = 4'b1111; // Para A MINUS 1
+                4'b0001: op_result = a | b;    // Para A PLUS (A OR B)
+                4'b0010: op_result = a | b;    // Para (A OR B) MINUS 1
+                4'b0011: op_result = 4'b1111;  // Para MINUS 1
+                4'b0100: op_result = a & b;    // Para A PLUS (A AND B)
+                4'b0101: op_result = (a | b) | (a & b); // Para (A OR B) PLUS (A AND B)
+                4'b0110: op_result = ~b;       // Para A MINUS B MINUS 1
+                4'b0111: op_result = a & ~b;   // Para (A AND ~B) MINUS 1
+                4'b1000: op_result = a & ~b;   // Para A PLUS (A AND ~B)
+                4'b1001: op_result = b;        // Para A PLUS B
+                4'b1010: op_result = (a | ~b) | (a & b); // Para (A OR ~B) PLUS (A AND B)
+                4'b1011: op_result = a & b;    // Para (A AND B) MINUS 1
+                4'b1100: op_result = a;        // Para A PLUS A
+                4'b1101: op_result = (a | b) | a; // Para (A OR B) PLUS A
+                4'b1110: op_result = (a | ~b) | a; // Para (A OR ~B) PLUS A
+                4'b1111: op_result = a;        // Para A
+                default: op_result = 4'b0000;
+            endcase
+        end else begin
+            op_result = 4'b0000; // No modo lógico
+        end
+    end
+    
+    // Para cada bit, calculamos P e G conforme o datasheet
     generate
         genvar i;
         for (i = 0; i < 4; i = i + 1) begin: pg_gen
-            assign p_bits[i] = (m == 1'b0) ? (a[i] | b[i]) : 1'b0; // Propagate no modo aritmético
-            assign g_bits[i] = (m == 1'b0) ? (a[i] & b[i]) : 1'b0; // Generate no modo aritmético
+            // No modo aritmético, P e G dependem das operações
+            // No modo lógico, P=0 e G=1 (desabilita look-ahead)
+            assign p_bits[i] = (m == 1'b0) ? (a[i] | op_result[i]) : 1'b0;
+            assign g_bits[i] = (m == 1'b0) ? (a[i] & op_result[i]) : 1'b0;
         end
     endgenerate
     
-    // P e G para o carry look-ahead são calculados por:
+    // P e G para o carry look-ahead (para todo o grupo de 4 bits)
     // P = p0 & p1 & p2 & p3 (AND de todos os bits de propagate)
     // G = g3 | (p3 & g2) | (p3 & p2 & g1) | (p3 & p2 & p1 & g0)
-    assign p = &p_bits; // AND de todos os bits P
-    assign g = g_bits[3] | 
-              (p_bits[3] & g_bits[2]) | 
-              (p_bits[3] & p_bits[2] & g_bits[1]) | 
-              (p_bits[3] & p_bits[2] & p_bits[1] & g_bits[0]);
+    assign p = (m == 1'b0) ? &p_bits : 1'b0; // AND de todos os bits P
+    assign g = (m == 1'b0) ? (
+                g_bits[3] | 
+                (p_bits[3] & g_bits[2]) | 
+                (p_bits[3] & p_bits[2] & g_bits[1]) | 
+                (p_bits[3] & p_bits[2] & p_bits[1] & g_bits[0])
+              ) : 1'b1; // G = 1 no modo lógico
 
     // Registrador de 5 bits para soma aritmética
     reg [4:0] sum_arith;
@@ -65,37 +101,73 @@ module ula_74181 (
             endcase
             c_out = 1'b0;
         end else begin
-            // Modo aritmético (m = 0)
+            // Modo aritmético (m = 0) - Operações conforme datasheet SN74LS181
             case (s)
-                4'b0000: sum_arith = {1'b0, a} + {1'b0, a}; // F = A + A
-                4'b0001: sum_arith = {1'b0, a} + {1'b0, a|b}; // F = A + (A|B)
-                4'b0010: sum_arith = {1'b0, a} + {1'b0, a|~b}; // F = A + (A|~B)
-                4'b0011: sum_arith = {1'b0, a} + {1'b0, 4'b1111}; // F = A + (-1)
-                4'b0100: sum_arith = {1'b0, a} + {1'b0, a&b}; // F = A + (A&B)
-                4'b0101: sum_arith = {1'b0, a} + {1'b0, b} + c_in; // F = A + B + Cin
-                4'b0110: sum_arith = {1'b0, a} + {1'b0, b} + c_in; // F = A + B + Cin
-                4'b0111: sum_arith = {1'b0, a} + {1'b0, a} + c_in; // F = A + A + Cin
-                4'b1000: sum_arith = {1'b0, a} + {1'b0, ~b} + c_in; // F = A + ~B + C_in
-                4'b1001: sum_arith = {1'b0, a&b} + {1'b0, ~b} + c_in; // F = (A&B) + ~B + C_in
-                4'b1010: sum_arith = {1'b0, a&~b} + {1'b0, ~b} + c_in; // F = (A&~B) + ~B + C_in
-                4'b1011: sum_arith = {1'b0, a&b} + {1'b0, a} + c_in; // F = (A&B) + A + C_in
-                4'b1100: sum_arith = {1'b0, a|~b} + {1'b0, a} + c_in; // F = (A|~B) + A + C_in
-                4'b1101: sum_arith = {1'b0, a|b} + {1'b0, a} + c_in; // F = (A|B) + A + C_in
-                4'b1110: sum_arith = {1'b0, a|b} + {1'b0, 4'b1111} + c_in; // F = (A|B) - 1 + C_in
-                4'b1111: sum_arith = {1'b0, a} + {1'b0, 4'b1111} + c_in; // F = A - 1 + C_in
+                // F = A MINUS 1 (A - 1, implementado como A + 1111 + Cin)
+                4'b0000: sum_arith = {1'b0, a} + {1'b0, 4'b1111} + c_in;
+
+                // F = A PLUS (A OR B) (A + (A|B) + Cin)
+                4'b0001: sum_arith = {1'b0, a} + {1'b0, a|b} + c_in;
+                
+                // F = (A OR B) MINUS 1 (implementado como (A|B) + 1111 + Cin)
+                4'b0010: sum_arith = {1'b0, a|b} + {1'b0, 4'b1111} + c_in;
+                
+                // F = MINUS 1 (implementado como 0 + 1111 + Cin)
+                4'b0011: sum_arith = {1'b0, 4'b0000} + {1'b0, 4'b1111} + c_in;
+                
+                // F = A PLUS (A AND B) (A + (A&B) + Cin)
+                4'b0100: sum_arith = {1'b0, a} + {1'b0, a&b} + c_in;
+                
+                // F = (A OR B) PLUS (A AND B) (implementado como (A|B) + (A&B) + Cin)
+                4'b0101: sum_arith = {1'b0, a|b} + {1'b0, a&b} + c_in;
+                
+                // F = A MINUS B MINUS 1 (implementado como A + ~B + Cin)
+                4'b0110: sum_arith = {1'b0, a} + {1'b0, ~b} + c_in;
+                
+                // F = (A AND ~B) MINUS 1 (implementado como (A&~B) + 1111 + Cin)
+                4'b0111: sum_arith = {1'b0, a&~b} + {1'b0, 4'b1111} + c_in;
+                
+                // F = A PLUS (A AND ~B) (A + (A&~B) + Cin)
+                4'b1000: sum_arith = {1'b0, a} + {1'b0, a&~b} + c_in;
+                
+                // F = A PLUS B (A + B + Cin)
+                4'b1001: sum_arith = {1'b0, a} + {1'b0, b} + c_in;
+                
+                // F = (A OR ~B) PLUS (A AND B) ((A|~B) + (A&B) + Cin)
+                4'b1010: sum_arith = {1'b0, a|~b} + {1'b0, a&b} + c_in;
+                
+                // F = (A AND B) MINUS 1 ((A&B) + 1111 + Cin)
+                4'b1011: sum_arith = {1'b0, a&b} + {1'b0, 4'b1111} + c_in;
+                
+                // F = A PLUS A (2*A + Cin)
+                4'b1100: sum_arith = {1'b0, a} + {1'b0, a} + c_in;
+                
+                // F = (A OR B) PLUS A ((A|B) + A + Cin)
+                4'b1101: sum_arith = {1'b0, a|b} + {1'b0, a} + c_in;
+                
+                // F = (A OR ~B) PLUS A ((A|~B) + A + Cin)
+                4'b1110: sum_arith = {1'b0, a|~b} + {1'b0, a} + c_in;
+                
+                // F = A (A + 0 + Cin)
+                4'b1111: sum_arith = {1'b0, a} + {1'b0, 4'b0000} + c_in;
                 default: sum_arith = 5'bxxxxx;
             endcase
 
             f = sum_arith[3:0];
-            // Tratamento correto do carry-out conforme o datasheet do SN74LS181
-            // Para operações de subtração (A-B), o carry-out é o complemento do borrow
+            
+            // Tratamento do carry-out conforme exatamente a tabela do datasheet SN74LS181
+            // O comportamento do carry varia conforme o código da operação S
             case (s)
-                // Operações de subtração
-                4'b0010, 4'b0011, 4'b0110, 4'b0111, 4'b1000, 4'b1001, 4'b1010, 4'b1110, 4'b1111:
-                    c_out = ~sum_arith[4]; // Complemento do carry para operações de subtração
-                // Operações de adição
-                default:
-                    c_out = sum_arith[4];  // Carry direto para operações de adição
+                // Operações com carry complementado (subtração ou outras operações específicas)
+                4'b0000: c_out = ~sum_arith[4]; // A MINUS 1
+                4'b0010: c_out = ~sum_arith[4]; // (A OR B) MINUS 1
+                4'b0011: c_out = ~sum_arith[4]; // MINUS 1
+                4'b0110: c_out = ~sum_arith[4]; // A MINUS B MINUS 1
+                4'b0111: c_out = ~sum_arith[4]; // (A AND ~B) MINUS 1
+                4'b1011: c_out = ~sum_arith[4]; // (A AND B) MINUS 1
+                
+                // Operações com carry direto (adição e outras operações)
+                default: c_out = sum_arith[4];
             endcase
         end
     end
