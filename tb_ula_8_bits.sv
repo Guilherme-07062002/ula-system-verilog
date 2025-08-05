@@ -90,12 +90,16 @@ module tb_ula_8_bits;
             endcase
             
             // Casos de teste para funções aritméticas
-            for (i = 0; i < 4; i = i + 1) begin
+            for (i = 0; i < 8; i = i + 1) begin
                 case (i)
-                    0: begin a = 8'h00; b = 8'h00; c_in = 1'b0; end
-                    1: begin a = 8'h0F; b = 8'h01; c_in = 1'b0; end
-                    2: begin a = 8'hFF; b = 8'h01; c_in = 1'b0; end
-                    3: begin a = 8'hAA; b = 8'hAA; c_in = 1'b1; end
+                    0: begin a = 8'h00; b = 8'h00; c_in = 1'b0; end  // Caso base
+                    1: begin a = 8'h0F; b = 8'h01; c_in = 1'b0; end  // Teste LSB
+                    2: begin a = 8'hFF; b = 8'h01; c_in = 1'b0; end  // Overflow
+                    3: begin a = 8'hAA; b = 8'hAA; c_in = 1'b1; end  // Números iguais com carry
+                    4: begin a = 8'h0F; b = 8'hF0; c_in = 1'b0; end  // Teste propagação entre ULAs
+                    5: begin a = 8'h7F; b = 8'h01; c_in = 1'b0; end  // Teste carry entre ULAs
+                    6: begin a = 8'hFF; b = 8'hFF; c_in = 1'b1; end  // Máximo overflow
+                    7: begin a = 8'h55; b = 8'hAA; c_in = 1'b0; end  // Padrão alternado
                 endcase
                 
                 #10;

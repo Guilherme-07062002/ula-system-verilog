@@ -40,7 +40,7 @@ module ula_8_bits (
         .c_in(c_out_lsb), // Conexão Ripple Carry
         .f(f_msb),
         .a_eq_b(a_eq_b_msb),
-        .c_out(c_out_msb)
+        .c_out(c_out)     // O carry_out do MSB é o carry_out final
     );
 
     // Conectando as saídas dos módulos de 4 bits para formar a saída de 8 bits
@@ -49,7 +49,7 @@ module ula_8_bits (
     // A saída a_eq_b para 8 bits é ativa se ambos os módulos de 4 bits indicarem igualdade
     assign a_eq_b = a_eq_b_lsb & a_eq_b_msb;
 
-    // O carry out final é o carry out da ULA mais significativa
-    assign c_out = c_out_msb;
+    // O carry out final já está conectado diretamente na instanciação da ULA MSB
+    // Não é necessário fazer um assign adicional pois já foi feito na instanciação
 
 endmodule
