@@ -124,7 +124,7 @@ module tb_ula_8_bits_final;
         input [3:0] s_val;
         input m_val;
         begin
-            $display("\nTestando operação: M=%b, S=%04b", m_val, s_val);
+        $display("\nTestando operacao: M=%b, S=%04b", m_val, s_val);
             
             // Testamos com carry in 0 e 1
             for (int ci = 0; ci <= 1; ci = ci + 1) begin
@@ -171,7 +171,7 @@ module tb_ula_8_bits_final;
         end
         
         // Testes específicos para ripple carry
-        $display("\n=== Testes Específicos de Ripple Carry ===");
+        $display("\n=== Testes Especificos de Ripple Carry ===");
         
         // Adição que propaga carry do LSB para o MSB
         s = 4'b1001; // A + B
@@ -192,11 +192,11 @@ module tb_ula_8_bits_final;
         a = 8'h7F;
         b = 8'h01;
         #10;
-        $display("Overflow positivo->negativo: A=%02h + B=%02h = F=%02h, Cout=%b, OVF=%b", a, b, f, c_out, overflow);
+        $display("Overflow positivo-para-negativo: A=%02h + B=%02h = F=%02h, Cout=%b, OVF=%b", a, b, f, c_out, overflow);
         if (f === 8'h80 && overflow === 1) begin
-            $display("  PASSOU: Detecção de overflow funcionando corretamente");
+            $display("  PASSOU: Deteccao de overflow funcionando corretamente");
         end else begin
-            $display("  FALHOU: Detecção de overflow incorreta");
+            $display("  FALHOU: Deteccao de overflow incorreta");
             errors = errors + 1;
         end
         
@@ -206,9 +206,9 @@ module tb_ula_8_bits_final;
         $display("Total de erros: %d", errors);
         
         if (errors == 0) begin
-            $display("SUCESSO: Todos os testes passaram!");
+        $display("SUCESSO: Todos os testes passaram!");
         end else begin
-            $display("FALHA: %d erros detectados.", errors);
+        $display("FALHA: %d erros detectados.", errors);
         end
         
         $finish;

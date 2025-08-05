@@ -10,7 +10,7 @@ module tb_ula_74181_datasheet;
     wire [3:0] f;
     wire a_eq_b, c_out, p, g;
     
-    // Instanciação da ULA
+    // Instanciacao da ULA
     ula_74181 uut (
         .a(a),
         .b(b),
@@ -90,7 +90,7 @@ module tb_ula_74181_datasheet;
         input m;
         begin
             if (m == 1'b1) begin
-                calculate_expected_cout = 1'b0; // No modo lógico, cout é sempre 0
+                calculate_expected_cout = 1'b0; // No modo logico, cout e sempre 0
             end else begin
                 case(s)
                     // Operações com carry complementado
@@ -111,7 +111,7 @@ module tb_ula_74181_datasheet;
         reg [3:0] p_bits;
         begin
             if (m == 1'b1) begin
-                calculate_expected_p = 1'b0; // No modo lógico, p é sempre 0
+                calculate_expected_p = 1'b0; // No modo logico, p e sempre 0
             end else begin
                 // P = (A0 | Y0) & (A1 | Y1) & (A2 | Y2) & (A3 | Y3)
                 p_bits[0] = a[0] | op_result[0];
@@ -129,7 +129,7 @@ module tb_ula_74181_datasheet;
         reg [3:0] p_bits, g_bits;
         begin
             if (m == 1'b1) begin
-                calculate_expected_g = 1'b1; // No modo lógico, g é sempre 1
+                calculate_expected_g = 1'b1; // No modo logico, g e sempre 1
             end else begin
                 // Calculamos p_bits e g_bits para cada bit
                 for (int i = 0; i < 4; i = i + 1) begin
@@ -168,9 +168,9 @@ module tb_ula_74181_datasheet;
             if (m == 1'b1) begin
                 // Modo lógico
                 expected_f = calculate_expected_f_logic(s, a, b);
-                expected_cout = 1'b0; // No modo lógico, cout é sempre 0
-                expected_p = 1'b0;    // No modo lógico, p é sempre 0
-                expected_g = 1'b1;    // No modo lógico, g é sempre 1
+                expected_cout = 1'b0; // No modo logico, cout e sempre 0
+                expected_p = 1'b0;    // No modo logico, p e sempre 0
+                expected_g = 1'b1;    // No modo logico, g e sempre 1
             end else begin
                 // Modo aritmético
                 // Calculamos o resultado esperado
@@ -221,8 +221,8 @@ module tb_ula_74181_datasheet;
         $dumpfile("ula_74181_datasheet.vcd");
         $dumpvars(0, tb_ula_74181_datasheet);
         
-        $display("=== Testbench de Validação Completa da ULA 74181 ===");
-        $display("Testando todos os 64 casos (16 funções × 2 modos × 2 valores de Cin)");
+        $display("=== Testbench de Validacao Completa da ULA 74181 ===");
+        $display("Testando todos os 64 casos (16 funcoes x 2 modos x 2 valores de Cin)");
         
         errors = 0;
         total_tests = 0;
@@ -234,7 +234,7 @@ module tb_ula_74181_datasheet;
             
             for (int func = 0; func < 16; func = func + 1) begin
                 s = func[3:0];
-                $display("Função S=%04b:", s);
+                $display("Funcao S=%04b:", s);
                 
                 for (int cin_val = 0; cin_val <= 1; cin_val = cin_val + 1) begin
                     c_in = cin_val;
@@ -258,7 +258,7 @@ module tb_ula_74181_datasheet;
             $display("\n=== %0d ERROS em %0d testes! ===", errors, total_tests);
         end
         
-        $display("\n=== Simulação Concluída ===");
+        $display("\n=== Simulacao Concluida ===");
         #100;
         $finish;
     end
