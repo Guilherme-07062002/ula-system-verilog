@@ -82,9 +82,9 @@ module tb_ula_74181;
         b = 4'b1111;
         #10;
         $display("Caso P=0, G=1: A=%04b, B=%04b => P=%b, G=%b (esperado: P=0, G=1)", a, b, p, g);
-        
+
         // Caso 3: Verificação do carry-out com base em P e G
-        $display("\n=== Verificação do carry out com Cin=1 ===");
+        $display("\n=== Verificacao do carry out com Cin=1 ===");
         c_in = 1'b1;
         a = 4'b0101;
         b = 4'b1010;

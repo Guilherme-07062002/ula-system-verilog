@@ -145,9 +145,68 @@ A ULA de 8 bits é construída a partir de duas instâncias da `ula_74181.sv`. O
       * `c_out`: Saída de *carry* (Carry Out).
 
 
-## Testbenches
 
-Os testbenches implementados realizam testes abrangentes:
+## Como Executar Testbenches Individualmente
+
+Se quiser rodar um testbench específico, utilize os comandos abaixo (lembre-se de ajustar o caminho se necessário):
+
+### ULA 74181 (4 bits)
+
+**Testbench básico:**
+```bash
+# Compile o testbench
+iverilog -g2012 -o sim/ula_74181.vvp rtl/ula_74181.sv tb/tb_ula_74181.sv
+
+# Execute a simulação
+vvp sim/ula_74181.vvp
+```
+
+**Testbench datasheet:**
+```bash
+# Compile o testbench completo baseado no datasheet
+iverilog -g2012 -o sim/ula_74181_datasheet.vvp rtl/ula_74181.sv tb/tb_ula_74181_datasheet.sv
+
+# Execute a simulação
+vvp sim/ula_74181_datasheet.vvp
+```
+
+### ULA de 8 bits
+
+**Testbench básico:**
+```bash
+# Compile o testbench básico
+iverilog -g2012 -o sim/ula_8_bits.vvp rtl/ula_74181.sv rtl/ula_8_bits.sv tb/tb_ula_8_bits.sv
+
+# Execute a simulação
+vvp sim/ula_8_bits.vvp
+```
+
+**Testbench datasheet:**
+```bash
+# Compile o testbench completo baseado no datasheet
+iverilog -g2012 -o sim/ula_8_bits_datasheet.vvp rtl/ula_74181.sv rtl/ula_8_bits.sv tb/tb_ula_8_bits_datasheet.sv
+
+# Execute a simulação
+vvp sim/ula_8_bits_datasheet.vvp
+```
+
+**Testbench final (100% cobertura):**
+```bash
+# Compile o testbench final com 100% de cobertura
+iverilog -g2012 -o sim/ula_8_bits_final.vvp rtl/ula_74181.sv rtl/ula_8_bits.sv tb/tb_ula_8_bits_final.sv
+
+# Execute a simulação
+vvp sim/ula_8_bits_final.vvp
+```
+
+**Testbench simples:**
+```bash
+# Compile o testbench
+iverilog -g2012 -o sim/ula_8_bits_simples.vvp rtl/ula_74181.sv rtl/ula_8_bits.sv tb/tb_ula_8_bits_simples.sv
+
+# Execute a simulação
+vvp sim/ula_8_bits_simples.vvp
+```
 
 - **tb_ula_74181.sv**: Testa todas as 32 funções da ULA 74181 com múltiplos vetores de teste, incluindo casos extremos (0000, 1111) e casos intermediários.
 
