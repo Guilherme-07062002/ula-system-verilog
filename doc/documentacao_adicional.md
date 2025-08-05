@@ -1,4 +1,5 @@
-```
+# Documentação Adicional: Análise da ULA 74181 e ULA de 8 bits
+
 O objetivo deste documento é analisar e entender o comportamento da implementação da ULA 74181 e sua versão de 8 bits, com foco na verificação da compatibilidade com o datasheet original.
 
 ## Comportamento da ULA 74181 (4 bits)
@@ -179,4 +180,3 @@ A implementação da ULA 74181 e da ULA de 8 bits construída a partir dela é f
 A abordagem em camadas para testes (básicos, compatibilidade com datasheet e práticos) demonstra uma metodologia de engenharia robusta, garantindo que a implementação seja validada de diferentes perspectivas e com diferentes níveis de rigor.
 
 Estas implementações podem ser utilizadas como base para construção de ALUs mais complexas ou como componentes em sistemas de processamento digital.
-```
