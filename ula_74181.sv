@@ -55,10 +55,10 @@ module ula_74181 (
       // Modo aritmético: implementação conforme datasheet 74181
       case (s)
         4'b0000: begin
-            // F = A MINUS 1 (A + ~0 + Cin)
-            sum_arith = a + 4'b1111 + c_in;
+            // F = A MINUS 1 + Cin
+            sum_arith = a + (-1) + c_in;  // Usando notação de número negativo
             f = sum_arith[3:0];
-            c_out = sum_arith[4];  // Removed inversion for consistency
+            c_out = sum_arith[4];
         end
         4'b0001: begin
             // F = A PLUS B
@@ -73,8 +73,8 @@ module ula_74181 (
             c_out = sum_arith[4];
         end
         4'b0011: begin
-            // F = MINUS 1 (0 + ~0 + Cin = 1111 + Cin)
-            sum_arith = 4'b0000 + 4'b1111 + c_in;
+            // F = MINUS 1 + Cin
+            sum_arith = (-1) + c_in;  // Simplificado para usar número negativo diretamente
             f = sum_arith[3:0];
             c_out = sum_arith[4];
         end
@@ -98,7 +98,7 @@ module ula_74181 (
         end
         4'b0111: begin
             // F = (A AND ~B) MINUS 1 + Cin
-            sum_arith = (a & (~b)) + 4'b1111 + c_in;
+            sum_arith = (a & (~b)) + (-1) + c_in;  // Usando notação de número negativo
             f = sum_arith[3:0];
             c_out = sum_arith[4];
         end
@@ -121,8 +121,8 @@ module ula_74181 (
             c_out = sum_arith[4];
         end
         4'b1011: begin
-            // F = A MINUS 1 + Cin (A + ~0 + Cin)
-            sum_arith = a + 4'b1111 + c_in;
+            // F = A MINUS 1 + Cin
+            sum_arith = a + (-1) + c_in;  // Usando notação de número negativo
             f = sum_arith[3:0];
             c_out = sum_arith[4];
         end
@@ -145,8 +145,8 @@ module ula_74181 (
             c_out = sum_arith[4];
         end
         4'b1111: begin
-            // F = A MINUS 1 + Cin (A + ~0 + Cin)
-            sum_arith = a + 4'b1111 + c_in;
+            // F = A MINUS 1 + Cin
+            sum_arith = a + (-1) + c_in;  // Usando notação de número negativo
             f = sum_arith[3:0];
             c_out = sum_arith[4];
         end
