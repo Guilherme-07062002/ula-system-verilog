@@ -23,139 +23,42 @@ module ula_74181 (
   reg [4:0] sum_arith;   // soma com espaço para carry
 
   always @* begin
+    // Inicialização de variáveis
     logic_f = 4'b0000;
     c_out   = 1'b0;
     f       = 4'b0000;
 
+    // Cálculo de logic_f independente do modo (usado por ambos os modos)
+    case (s)
+      4'b0000: logic_f = ~a;           // NOT A
+      4'b0001: logic_f = ~(a | b);     // NOR
+      4'b0010: logic_f = (~a) & b;     // A̅ & B
+      4'b0011: logic_f = 4'b0000;      // ZERO
+      4'b0100: logic_f = ~(a & b);     // NAND
+      4'b0101: logic_f = ~b;           // NOT B
+      4'b0110: logic_f = a ^ b;        // XOR
+      4'b0111: logic_f = a & (~b);     // A & B̅
+      4'b1000: logic_f = (~a) | b;     // A̅ | B
+      4'b1001: logic_f = ~(a ^ b);     // XNOR (≡ NOT XOR)
+      4'b1010: logic_f = b;            // B
+      4'b1011: logic_f = a & b;        // AND
+      4'b1100: logic_f = 4'b1111;      // ONE
+      4'b1101: logic_f = a | (~b);     // A | B̅
+      4'b1110: logic_f = a | b;        // OR
+      4'b1111: logic_f = a;            // A
+      default: logic_f = 4'bxxxx;
+    endcase
+    
     if (m) begin
-      // Modo lógico: implementação direta das operações booleanas
-      case (s)
-        4'b0000: logic_f = ~a;           // NOT A
-        4'b0001: logic_f = ~(a | b);     // NOR
-        4'b0010: logic_f = (~a) & b;     // A̅ & B
-        4'b0011: logic_f = 4'b0000;      // ZERO
-        4'b0100: logic_f = ~(a & b);     // NAND
-        4'b0101: logic_f = ~b;           // NOT B
-        4'b0110: logic_f = a ^ b;        // XOR
-        4'b0111: logic_f = a & (~b);     // A & B̅
-        4'b1000: logic_f = (~a) | b;     // A̅ | B
-        4'b1001: logic_f = ~(a ^ b);     // XNOR (≡ NOT XOR)
-        4'b1010: logic_f = b;            // B
-        4'b1011: logic_f = a & b;        // AND
-        4'b1100: logic_f = 4'b1111;      // ONE
-        4'b1101: logic_f = a | (~b);     // A | B̅
-        4'b1110: logic_f = a | b;        // OR
-        4'b1111: logic_f = a;            // A
-        default: logic_f = 4'bxxxx;
-      endcase
-      
+      // Modo lógico: saída direta da operação lógica
       f = logic_f;
     end
     else begin
-      // Modo aritmético: implementação conforme datasheet 74181
-      case (s)
-        4'b0000: begin
-            // F = A MINUS 1 + Cin
-            sum_arith = a + (-1) + c_in;  // Usando notação de número negativo
-            f = sum_arith[3:0];
-            c_out = sum_arith[4];
-        end
-        4'b0001: begin
-            // F = A PLUS B
-            sum_arith = a + b + c_in;
-            f = sum_arith[3:0];
-            c_out = sum_arith[4];
-        end
-        4'b0010: begin
-            // F = A PLUS ~B (A - B - 1 + Cin)
-            sum_arith = a + (~b) + c_in;
-            f = sum_arith[3:0];
-            c_out = sum_arith[4];
-        end
-        4'b0011: begin
-            // F = MINUS 1 + Cin
-            sum_arith = (-1) + c_in;  // Simplificado para usar número negativo diretamente
-            f = sum_arith[3:0];
-            c_out = sum_arith[4];
-        end
-        4'b0100: begin
-            // F = A PLUS (A AND ~B)
-            sum_arith = a + (a & (~b)) + c_in;
-            f = sum_arith[3:0];
-            c_out = sum_arith[4];
-        end
-        4'b0101: begin
-            // F = (A OR B) PLUS (A AND ~B)
-            sum_arith = (a | b) + (a & (~b)) + c_in;
-            f = sum_arith[3:0];
-            c_out = sum_arith[4];
-        end
-        4'b0110: begin
-            // F = A MINUS B MINUS 1 + Cin
-            sum_arith = a + (~b) + c_in;
-            f = sum_arith[3:0];
-            c_out = sum_arith[4];
-        end
-        4'b0111: begin
-            // F = (A AND ~B) MINUS 1 + Cin
-            sum_arith = (a & (~b)) + (-1) + c_in;  // Usando notação de número negativo
-            f = sum_arith[3:0];
-            c_out = sum_arith[4];
-        end
-        4'b1000: begin
-            // F = A PLUS (A AND B)
-            sum_arith = a + (a & b) + c_in;
-            f = sum_arith[3:0];
-            c_out = sum_arith[4];
-        end
-        4'b1001: begin
-            // F = A PLUS B
-            sum_arith = a + b + c_in;
-            f = sum_arith[3:0];
-            c_out = sum_arith[4];
-        end
-        4'b1010: begin
-            // F = (A OR ~B) PLUS (A AND B)
-            sum_arith = (a | (~b)) + (a & b) + c_in;
-            f = sum_arith[3:0];
-            c_out = sum_arith[4];
-        end
-        4'b1011: begin
-            // F = (A AND B) MINUS 1 + Cin - Corrigido conforme o datasheet
-            sum_arith = (a & b) + (-1) + c_in;  // (A AND B) MINUS 1 + Cin
-            f = sum_arith[3:0];
-            c_out = sum_arith[4];
-        end
-        4'b1100: begin
-            // F = A PLUS A (2A)
-            sum_arith = a + a + c_in;
-            f = sum_arith[3:0];
-            c_out = sum_arith[4];
-        end
-        4'b1101: begin
-            // F = (A OR B) PLUS A
-            sum_arith = (a | b) + a + c_in;
-            f = sum_arith[3:0];
-            c_out = sum_arith[4];
-        end
-        4'b1110: begin
-            // F = (A OR ~B) PLUS A
-            sum_arith = (a | (~b)) + a + c_in;
-            f = sum_arith[3:0];
-            c_out = sum_arith[4];
-        end
-        4'b1111: begin
-            // F = A MINUS 1 + Cin
-            sum_arith = a + (-1) + c_in;  // Usando notação de número negativo
-            f = sum_arith[3:0];
-            c_out = sum_arith[4];
-        end
-        default: begin
-            sum_arith = 5'bxxxxx;
-            f = 4'bxxxx;
-            c_out = 1'bx;
-        end
-      endcase
+      // Modo aritmético: F = A + logic_f + Cin (conforme datasheet)
+      // Todas as 16 funções aritméticas seguem este padrão
+      sum_arith = a + logic_f + c_in;
+      f = sum_arith[3:0];
+      c_out = sum_arith[4];
     end
   end
 
