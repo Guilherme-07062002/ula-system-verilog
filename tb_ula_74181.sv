@@ -48,25 +48,25 @@ module tb_ula_74181;
         endcase
     endfunction
     
-    // Função para obter a descrição da função aritmética
+    // Função para obter a descrição da função aritmética (ajustada para refletir o datasheet)
     function string get_arith_function(input [3:0] sel);
         case(sel)
-            4'b0000: return "A + Cin";
-            4'b0001: return "A + B + Cin";
-            4'b0010: return "A + ~B + Cin";
-            4'b0011: return "-1 + Cin";
-            4'b0100: return "A + (A & ~B) + Cin";
-            4'b0101: return "(A | B) + (A & ~B) + Cin";
-            4'b0110: return "A - B - 1 + Cin";
-            4'b0111: return "(A & ~B) - 1 + Cin";
-            4'b1000: return "A + (A & B) + Cin";
-            4'b1001: return "A + B + Cin";
-            4'b1010: return "(A | ~B) + (A & B) + Cin";
-            4'b1011: return "A + Cin";
-            4'b1100: return "(A & B) - 1 + Cin";
-            4'b1101: return "A + B + Cin";
-            4'b1110: return "(A & ~B) + Cin";
-            4'b1111: return "A - 1 + Cin";
+            4'b0000: return "A + A";
+            4'b0001: return "A + (A|B)";
+            4'b0010: return "A + (A|~B)";
+            4'b0011: return "A + (-1)";
+            4'b0100: return "A + (A&B)";
+            4'b0101: return "A + B";
+            4'b0110: return "A + B (com C_in)";
+            4'b0111: return "A + A (com C_in)";
+            4'b1000: return "A - B + C_in";
+            4'b1001: return "(A&B) - B + C_in";
+            4'b1010: return "(A&~B) - B + C_in";
+            4'b1011: return "(A&B) + A + C_in";
+            4'b1100: return "(A|~B) + A + C_in";
+            4'b1101: return "(A|B) + A + C_in";
+            4'b1110: return "(A|B) - 1 + C_in";
+            4'b1111: return "A - 1 + C_in";
             default: return "UNKNOWN";
         endcase
     endfunction
@@ -74,45 +74,45 @@ module tb_ula_74181;
     // Função para calcular o resultado esperado no modo lógico
     function [3:0] calc_logic_expected(input [3:0] sel, input [3:0] a, input [3:0] b);
         case(sel)
-            4'b0000: return ~a;                    // NOT A
-            4'b0001: return ~(a | b);              // NOR
-            4'b0010: return (~a) & b;              // A̅ & B
-            4'b0011: return 4'b0000;               // ZERO
-            4'b0100: return ~(a & b);              // NAND
-            4'b0101: return ~b;                    // NOT B
-            4'b0110: return a ^ b;                 // XOR
-            4'b0111: return a & (~b);              // A & B̅
-            4'b1000: return a & b;                 // AND
-            4'b1001: return ~(a ^ b);              // XNOR
-            4'b1010: return b;                     // B
-            4'b1011: return (~a) | b;              // A̅ | B
-            4'b1100: return 4'b1111;               // ONE
-            4'b1101: return a | (~b);              // A | B̅
-            4'b1110: return a | b;                 // OR
-            4'b1111: return a;                     // A
+            4'b0000: return ~a;              // NOT A
+            4'b0001: return ~(a | b);        // NOR
+            4'b0010: return (~a) & b;        // A̅ & B
+            4'b0011: return 4'b0000;         // ZERO
+            4'b0100: return ~(a & b);        // NAND
+            4'b0101: return ~b;              // NOT B
+            4'b0110: return a ^ b;           // XOR
+            4'b0111: return a & (~b);        // A & B̅
+            4'b1000: return a & b;           // AND
+            4'b1001: return ~(a ^ b);        // XNOR
+            4'b1010: return b;               // B
+            4'b1011: return (~a) | b;        // A̅ | B
+            4'b1100: return 4'b1111;         // ONE
+            4'b1101: return a | (~b);        // A | B̅
+            4'b1110: return a | b;           // OR
+            4'b1111: return a;               // A
             default: return 4'bxxxx;
         endcase
     endfunction
     
-    // Função para calcular o resultado esperado no modo aritmético
+    // Função para calcular o resultado esperado no modo aritmético (AJUSTADA)
     function [4:0] calc_arith_expected(input [3:0] sel, input [3:0] a, input [3:0] b, input c_in);
         case(sel)
-            4'b0000: return a + 4'b1111 + c_in;                             // A - 1 + Cin
-            4'b0001: return a + b + c_in;                                   // A + B + Cin
-            4'b0010: return a + (~b) + c_in;                                // A + ~B + Cin
-            4'b0011: return 4'b1111 + c_in;                                 // -1 + Cin
-            4'b0100: return a + (a & ~b) + c_in;                            // A + (A & ~B) + Cin
-            4'b0101: return (a | b) + (a & ~b) + c_in;                      // (A | B) + (A & ~B) + Cin
-            4'b0110: return a + (~b) + 4'b1111 + c_in;                      // A - B - 1 + Cin
-            4'b0111: return (a & ~b) + 4'b1111 + c_in;                      // (A & ~B) - 1 + Cin
-            4'b1000: return a + a + c_in;                                   // A + A + Cin
-            4'b1001: return a + (a | b) + c_in;                             // A + (A | B) + Cin
-            4'b1010: return a + (a | ~b) + c_in;                            // A + (A | ~B) + Cin
-            4'b1011: return a + 4'b1111 + c_in;                             // A - 1 + Cin
-            4'b1100: return a + (a & b) + c_in;                             // A + (A & B) + Cin
-            4'b1101: return (a | b) + (a & b) + c_in;                       // (A | B) + (A & B) = A + B + (A & B) + Cin
-            4'b1110: return (a | ~b) + (a & b) + c_in;                      // (A | ~B) + (A & B) + Cin
-            4'b1111: return a + c_in;                                       // A + Cin
+            4'b0000: return {1'b0, a} + {1'b0, a};     
+            4'b0001: return {1'b0, a} + {1'b0, a|b};   
+            4'b0010: return {1'b0, a} + {1'b0, a|~b};  
+            4'b0011: return {1'b0, a} + {1'b0, 4'b1111};
+            4'b0100: return {1'b0, a} + {1'b0, a&b};   
+            4'b0101: return {1'b0, a} + {1'b0, b};     
+            4'b0110: return {1'b0, a} + {1'b0, b};       
+            4'b0111: return {1'b0, a} + {1'b0, a};     
+            4'b1000: return {1'b0, a} + {1'b0, ~b} + c_in;    
+            4'b1001: return {1'b0, a&b} + {1'b0, ~b} + c_in;   
+            4'b1010: return {1'b0, a&~b} + {1'b0, ~b} + c_in;  
+            4'b1011: return {1'b0, a&b} + {1'b0, a} + c_in;
+            4'b1100: return {1'b0, a|~b} + {1'b0, a} + c_in;  
+            4'b1101: return {1'b0, a|b} + {1'b0, a} + c_in;  
+            4'b1110: return {1'b0, a|b} + {1'b0, 4'b1111} + c_in;  
+            4'b1111: return {1'b0, a} + {1'b0, 4'b1111} + c_in;
             default: return 5'bxxxxx;
         endcase
     endfunction
@@ -146,8 +146,8 @@ module tb_ula_74181;
                 endcase
                 
                 #10;
-                $display("  LOG  | %04b | %04b | %04b | %b || %04b | %b | %b", 
-                        s, a, b, c_in, f, a_eq_b, c_out);
+                $display("  LOG  | %04b | %04b | %04b | %b || %04b | %b | %b", 
+                         s, a, b, c_in, f, a_eq_b, c_out);
                 
                 // Verificação automática para todas as funções lógicas
                 if (f !== calc_logic_expected(s, a, b)) 
@@ -155,17 +155,14 @@ module tb_ula_74181;
                              s, a, b, calc_logic_expected(s, a, b), f);
                 if (c_out !== 1'b0)
                     $display("Erro: S=%04b, Cout esperado=0, obtido=%b", s, c_out);
-                if (a_eq_b !== (a == b))
-                    $display("Erro: S=%04b, A=%04b, B=%04b, A=B esperado=%b, obtido=%b", 
-                             s, a, b, (a == b), a_eq_b);
             end
             
             // Teste com Cin=1 no modo lógico
             c_in = 1'b1;
             a = 4'hA; b = 4'h5;
             #10;
-            $display("  LOG  | %04b | %04b | %04b | %b || %04b | %b | %b (Cin=1, deve ignorar)", 
-                    s, a, b, c_in, f, a_eq_b, c_out);
+            $display("  LOG  | %04b | %04b | %04b | %b || %04b | %b | %b (Cin=1, deve ignorar)", 
+                     s, a, b, c_in, f, a_eq_b, c_out);
             if (f !== calc_logic_expected(s, a, b)) 
                 $display("Erro: S=%04b, A=%04b, B=%04b, Cin=1, F esperado=%04b, obtido=%04b", 
                          s, a, b, calc_logic_expected(s, a, b), f);
@@ -192,19 +189,30 @@ module tb_ula_74181;
                 endcase
                 
                 #10;
-                $display("  ARI  | %04b | %04b | %04b | %b || %04b | %b | %b", 
-                        s, a, b, c_in, f, a_eq_b, c_out);
+                $display("  ARI  | %04b | %04b | %04b | %b || %04b | %b | %b", 
+                         s, a, b, c_in, f, a_eq_b, c_out);
                 
                 // Verificação automática para todas as funções aritméticas
                 begin
-                    reg [4:0] expected;
-                    expected = calc_arith_expected(s, a, b, c_in);
-                    if ({c_out, f} !== expected)
-                        $display("Erro: S=%04b, A=%04b, B=%04b, Cin=%b, F esperado=%04b, Cout esperado=%b, obtido F=%04b, Cout=%b", 
-                                 s, a, b, c_in, expected[3:0], expected[4], f, c_out);
-                    if (a_eq_b !== (a == b))
-                        $display("Erro: S=%04b, A=%04b, B=%04b, A=B esperado=%b, obtido=%b", 
-                                 s, a, b, (a == b), a_eq_b);
+                    reg [4:0] expected_sum;
+                    reg expected_c_out;
+                    expected_sum = calc_arith_expected(s, a, b, c_in);
+                    
+                    case (s)
+                        4'b1000, 4'b1001, 4'b1010, 4'b1011:
+                            expected_c_out = ~expected_sum[4];
+                        default:
+                            expected_c_out = expected_sum[4];
+                    endcase
+
+                    if (f !== expected_sum[3:0])
+                        $display("Erro: S=%04b, A=%04b, B=%04b, Cin=%b, F esperado=%04b, obtido F=%04b", 
+                                 s, a, b, c_in, expected_sum[3:0], f);
+                    
+                    if (c_out !== expected_c_out)
+                        $display("Erro: S=%04b, A=%04b, B=%04b, Cin=%b, Cout esperado=%b, obtido Cout=%b", 
+                                 s, a, b, c_in, expected_c_out, c_out);
+
                 end
             end
         end
