@@ -227,6 +227,11 @@ module tb_ula_8_bits_datasheet;
             // Verificamos se os resultados estão corretos
             test_pass = (f === expected_f) && (c_out === expected_cout) && 
                         (overflow === expected_overflow);
+                        
+            // Exibir resultados em formato de tabela
+            $display("| %s | %04b | %02h | %02h |  %b  | %02h |  %b   |    %b     | %s |", 
+                    (m == 0) ? "ARI" : "LOG", s, a, b, c_in, f, c_out, overflow,
+                    test_pass ? "PASS" : "FAIL");
             
             if (!test_pass) begin
                 // Verificar se é uma limitação conhecida da arquitetura ripple carry
@@ -240,16 +245,13 @@ module tb_ula_8_bits_datasheet;
                 
                 if (is_ripple_carry_limitation) begin
                     // É uma limitação da arquitetura ripple carry, não é um erro real do design
-                    $display("AVISO - Limitação da Arquitetura Ripple Carry: M=%b, S=%b, A=%h, B=%h, Cin=%b", m, s, a, b, c_in);
-                    $display("  Obtido: F=%h, Cout=%b, Overflow=%b", f, c_out, overflow);
+                    $display("  AVISO - Limitação da Arquitetura Ripple Carry");
                     $display("  Esperado pelo Datasheet: F=%h, Cout=%b, Overflow=%b", expected_f, expected_cout, expected_overflow);
                     $display("  Esta diferença é esperada devido à arquitetura ripple carry entre as ULAs de 4 bits");
                     // Não incrementamos o contador de erros para limitações conhecidas
                 end else begin
                     errors = errors + 1;
-                    $display("ERRO: M=%b, S=%b, A=%h, B=%h, Cin=%b", m, s, a, b, c_in);
-                    $display("  Obtido: F=%h, Cout=%b, Overflow=%b", f, c_out, overflow);
-                    $display("  Esperado: F=%h, Cout=%b, Overflow=%b", expected_f, expected_cout, expected_overflow);
+                    $display("  ERRO: Esperado: F=%h, Cout=%b, Overflow=%b", expected_f, expected_cout, expected_overflow);
                 end
             end
         end
@@ -259,6 +261,8 @@ module tb_ula_8_bits_datasheet;
     task test_ripple_carry;
         begin
             $display("\n=== Testando Ripple Carry ===");
+            $display("| Modo | S    |   A   |   B   | Cin |   F   | Cout | Overflow | Status | Descrição |");
+            $display("|------|------|-------|-------|-----|-------|------|----------|--------|-----------|");
             
             // Adição de dois números de 8 bits que gera carry
             m = 0; // Modo aritmético
@@ -268,23 +272,27 @@ module tb_ula_8_bits_datasheet;
             // 127 + 1 = 128 (sem overflow, mas com ripple carry do nibble baixo para o alto)
             a = 8'h7F; b = 8'h01;
             #5;
-            $display("A=%h + B=%h = F=%h, Cout=%b, Overflow=%b", a, b, f, c_out, overflow);
+            $display("| ARI  | %04b | %02h | %02h |  %b  | %02h |  %b   |    %b     |  ---  | Ripple carry |", 
+                    s, a, b, c_in, f, c_out, overflow);
             
             // 255 + 1 = 0 com carry out
             a = 8'hFF; b = 8'h01;
             #5;
-            $display("A=%h + B=%h = F=%h, Cout=%b, Overflow=%b", a, b, f, c_out, overflow);
+            $display("| ARI  | %04b | %02h | %02h |  %b  | %02h |  %b   |    %b     |  ---  | Carry out |", 
+                    s, a, b, c_in, f, c_out, overflow);
             
             // Testando overflow com números com sinal
             // 127 + 1 = 128 (overflow positivo para negativo)
             a = 8'h7F; b = 8'h01;
             #5;
-            $display("A=%h + B=%h = F=%h, Cout=%b, Overflow=%b (Overflow esperado)", a, b, f, c_out, overflow);
+            $display("| ARI  | %04b | %02h | %02h |  %b  | %02h |  %b   |    %b     |  ---  | Overflow pos->neg |", 
+                    s, a, b, c_in, f, c_out, overflow);
             
             // -128 + (-1) = -129 (overflow negativo para positivo, representado como 127)
             a = 8'h80; b = 8'hFF;
             #5;
-            $display("A=%h + B=%h = F=%h, Cout=%b, Overflow=%b (Overflow esperado)", a, b, f, c_out, overflow);
+            $display("| ARI  | %04b | %02h | %02h |  %b  | %02h |  %b   |    %b     |  ---  | Overflow neg->pos |", 
+                    s, a, b, c_in, f, c_out, overflow);
         end
     endtask
     
@@ -298,18 +306,25 @@ module tb_ula_8_bits_datasheet;
         errors = 0;
         total_tests = 0;
         
+        // Cabeçalho da tabela para facilitar a leitura dos resultados
+        $display("| Modo | S    |   A   |   B   | Cin |   F   | Cout | Overflow | Status |");
+        $display("|------|------|-------|-------|-----|-------|------|----------|--------|");
+        
         // Testamos cada função com diferentes valores de entradas
         for (int mode = 0; mode <= 1; mode = mode + 1) begin
             m = mode;
             $display("\n=== MODO %s (M=%0d) ===", (m == 0) ? "ARITMETICO" : "LOGICO", m); // sem acento
+            $display("| Modo | S    |   A   |   B   | Cin |   F   | Cout | Overflow | Status |");
+            $display("|------|------|-------|-------|-----|-------|------|----------|--------|");
             
             for (int func = 0; func < 16; func = func + 1) begin
                 s = func[3:0];
-                $display("Funcao S=%04b:", s);
+                $display("\nFuncao S=%04b:", s);
+                $display("| Modo | S    |   A   |   B   | Cin |   F   | Cout | Overflow | Status |");
+                $display("|------|------|-------|-------|-----|-------|------|----------|--------|");
                 
                 for (int cin_val = 0; cin_val <= 1; cin_val = cin_val + 1) begin
                     c_in = cin_val;
-                    $display("  Cin=%b:", c_in);
                     
                     // Testamos alguns casos representativos para 8 bits
                     verify_operation(s, 8'h00, 8'h00, m, c_in);  // Zeros
