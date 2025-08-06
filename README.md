@@ -205,19 +205,19 @@ Para simular o projeto, você precisará ter o **Icarus Verilog** e o **GTKWave*
 2. **Execute a simulação**:
    ```bash
    # Testbench básico
-   vvp ula_74181.vvp
+   vvp sim/ula_74181.vvp
    
    # Testbench completo
-   vvp ula_74181_datasheet.vvp
+   vvp sim/ula_74181_datasheet.vvp
    ```
 
 3. **Visualize as formas de onda**:
    ```bash
    # Testbench básico
-   gtkwave ula_74181.vcd
+   gtkwave sim/ula_74181.vcd
    
    # Testbench completo
-   gtkwave ula_74181_datasheet.vcd
+   gtkwave sim/ula_74181_datasheet.vcd
    ```
 
 ### Simulação da ULA de 8 bits
@@ -237,17 +237,17 @@ Para simular o projeto, você precisará ter o **Icarus Verilog** e o **GTKWave*
 2. **Execute a simulação**:
    ```bash
    # Escolha o arquivo .vvp desejado
-   vvp ula_8_bits.vvp
-   vvp ula_8_bits_simples.vvp
-   vvp ula_8_bits_final.vvp
+   vvp sim/ula_8_bits.vvp
+   vvp sim/ula_8_bits_simples.vvp
+   vvp sim/ula_8_bits_final.vvp
    ```
 
 3. **Visualize as formas de onda**:
    ```bash
    # Escolha o arquivo .vcd gerado
-   gtkwave ula_8_bits.vcd
-   gtkwave ula_8_bits_simples.vcd
-   gtkwave ula_8_bits_final.vcd
+   gtkwave sim/ula_8_bits.vcd
+   gtkwave sim/ula_8_bits_simples.vcd
+   gtkwave sim/ula_8_bits_final.vcd
    ```
 
 ### Simulação da ULA de 8 bits Aprimorada
@@ -260,12 +260,12 @@ Para simular o projeto, você precisará ter o **Icarus Verilog** e o **GTKWave*
 
 2. **Execute a simulação**:
    ```bash
-   vvp ula_8_bits_enhanced.vvp
+   vvp sim/ula_8_bits_enhanced.vvp
    ```
 
 3. **Visualize as formas de onda**:
    ```bash
-   gtkwave ula_8_bits_enhanced.vcd
+   gtkwave sim/ula_8_bits_enhanced.vcd
    ```
 
 ## Análise e Conclusões
