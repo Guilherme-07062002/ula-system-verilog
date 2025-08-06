@@ -38,27 +38,11 @@ if %ERRORLEVEL% EQU 0 (
 )
 
 echo.
-echo === Compilando ULA 8 bits Final ===
-iverilog -g2012 -o "%SIM_DIR%\ula_8_bits_final.vvp" "%RTL_DIR%\ula_74181.sv" "%RTL_DIR%\ula_8_bits.sv" "%TB_DIR%\tb_ula_8_bits_final.sv"
-if %ERRORLEVEL% EQU 0 (
-    echo === Executando ULA 8 bits Final ===
-    vvp "%SIM_DIR%\ula_8_bits_final.vvp"
-)
-
-echo.
 echo === Compilando ULA 8 bits Datasheet ===
 iverilog -g2012 -o "%SIM_DIR%\ula_8_bits_datasheet.vvp" "%RTL_DIR%\ula_74181.sv" "%RTL_DIR%\ula_8_bits.sv" "%TB_DIR%\tb_ula_8_bits_datasheet.sv"
 if %ERRORLEVEL% EQU 0 (
     echo === Executando ULA 8 bits Datasheet ===
     vvp "%SIM_DIR%\ula_8_bits_datasheet.vvp"
-)
-
-echo.
-echo === Compilando ULA 8 bits Simples ===
-iverilog -g2012 -o "%SIM_DIR%\ula_8_bits_simples.vvp" "%RTL_DIR%\ula_74181.sv" "%RTL_DIR%\ula_8_bits.sv" "%TB_DIR%\tb_ula_8_bits_simples.sv"
-if %ERRORLEVEL% EQU 0 (
-    echo === Executando ULA 8 bits Simples ===
-    vvp "%SIM_DIR%\ula_8_bits_simples.vvp"
 )
 
 echo.

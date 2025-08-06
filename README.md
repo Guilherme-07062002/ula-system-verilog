@@ -12,7 +12,7 @@ O projeto está organizado nas seguintes pastas:
 
 - **rtl/**: Códigos-fonte HDL
 - **tb/**: Testbenches
-- **sim/**: Arquivos de simulação (scripts, waves)
+- **sim/**: Arquivos de simulação (VCD, VVP)
 - **build/**: Scripts de build automáticos (build.bat, build.sh)
 
 ## Implementações das ULAs
@@ -40,25 +40,13 @@ Esta é a implementação base da ULA de 4 bits que segue as especificações do
 Esta implementação combina duas instâncias da ULA 74181 para criar uma ULA de 8 bits:
 
 - **Arquitetura**: Utiliza duas ULAs de 4 bits, uma para os bits menos significativos (LSB) e outra para os mais significativos (MSB)
-- **Propagação de carry**: Implementa um método simples de carry look-ahead entre os dois blocos de 4 bits
+- **Propagação de carry**: Implementa um método de carry look-ahead entre os dois blocos de 4 bits
 - **Funcionalidades adicionais**:
   - Detecção de overflow para aritmética em complemento a dois
   - Suporte a operações de 8 bits completas
   - Sinais de carry look-ahead para integração em sistemas maiores
 
-- **Limitações identificadas**: Esta implementação apresenta problemas com algumas operações aritméticas específicas, principalmente aquelas que envolvem carry/borrow entre os nibbles (conjuntos de 4 bits). As simulações detalhadas mostram que aproximadamente 77 casos de teste de 394 falham.
-
-### ULA de 8 bits Aprimorada
-**Arquivo: `rtl/ula_8_bits_enhanced.sv`**
-
-Uma versão melhorada da ULA de 8 bits que corrige várias limitações da implementação original:
-
-- **Melhorias**:
-  - Correção específica para operações problemáticas como `(A OR B) MINUS 1` (S=0010) e `A MINUS 1` (S=0000)
-  - Implementação mais robusta do carry entre os blocos de 4 bits
-  - Tratamento especial para operações de decremento e outras operações críticas
-
-- **Resultados**: Esta versão reduz significativamente o número de erros (18 falhas em 320 testes), mas ainda apresenta algumas inconsistências em operações específicas.
+- **Limitações identificadas**: Esta implementação apresenta problemas com algumas operações aritméticas específicas, principalmente aquelas que envolvem carry/borrow entre os nibbles (conjuntos de 4 bits). As simulações detalhadas mostram que aproximadamente 18 casos de teste de 384 falham.
 
 ## Testbenches e Simulação
 
@@ -73,13 +61,6 @@ Uma versão melhorada da ULA de 8 bits que corrige várias limitações da imple
 - **`tb/tb_ula_8_bits.sv`**: Testbench básico para a ULA de 8 bits que verifica a funcionalidade básica e a integração correta dos dois módulos de 4 bits.
 
 - **`tb/tb_ula_8_bits_datasheet.sv`**: Testbench mais abrangente para a ULA de 8 bits que testa todas as operações seguindo as especificações do datasheet, mas adaptadas para o contexto de 8 bits.
-
-- **`tb/tb_ula_8_bits_final.sv`**: Testbench mais completo que busca uma cobertura de 100% para a ULA de 8 bits. Este testbench testa sistematicamente todas as operações com diferentes valores de entrada e verifica se os resultados estão corretos, comparando com os valores calculados de referência.
-
-- **`tb/tb_ula_8_bits_simples.sv`**: Testbench simplificado para realizar testes rápidos e focados em operações específicas. Útil durante o desenvolvimento e depuração.
-
-#### ULA de 8 bits Aprimorada
-- **`tb/tb_ula_8_bits_enhanced.sv`**: Testbench comparativo que executa testes idênticos nas duas implementações (original e aprimorada) da ULA de 8 bits, destacando as melhorias e corrigindo os casos problemáticos identificados. Este testbench é essencial para demonstrar as vantagens da implementação aprimorada.
 
 ### Arquivos de Simulação (pasta sim/)
 
@@ -225,79 +206,54 @@ Para simular o projeto, você precisará ter o **Icarus Verilog** e o **GTKWave*
 1. **Compile os módulos e o testbench**:
    ```bash
    # Testbench básico
-   iverilog -g2012 -o ula_8_bits.vvp rtl/ula_74181.sv rtl/ula_8_bits.sv tb/tb_ula_8_bits.sv
+   iverilog -g2012 -o sim/ula_8_bits.vvp rtl/ula_74181.sv rtl/ula_8_bits.sv tb/tb_ula_8_bits.sv
    
-   # Testbench simples
-   iverilog -g2012 -o ula_8_bits_simples.vvp rtl/ula_74181.sv rtl/ula_8_bits.sv tb/tb_ula_8_bits_simples.sv
-   
-   # Testbench final (cobertura completa)
-   iverilog -g2012 -o ula_8_bits_final.vvp rtl/ula_74181.sv rtl/ula_8_bits.sv tb/tb_ula_8_bits_final.sv
+   # Testbench baseado no datasheet
+   iverilog -g2012 -o sim/ula_8_bits_datasheet.vvp rtl/ula_74181.sv rtl/ula_8_bits.sv tb/tb_ula_8_bits_datasheet.sv
    ```
 
 2. **Execute a simulação**:
    ```bash
-   # Escolha o arquivo .vvp desejado
+   # Testbench básico
    vvp sim/ula_8_bits.vvp
-   vvp sim/ula_8_bits_simples.vvp
-   vvp sim/ula_8_bits_final.vvp
+   
+   # Testbench baseado no datasheet
+   vvp sim/ula_8_bits_datasheet.vvp
    ```
 
 3. **Visualize as formas de onda**:
    ```bash
    # Escolha o arquivo .vcd gerado
    gtkwave sim/ula_8_bits.vcd
-   gtkwave sim/ula_8_bits_simples.vcd
-   gtkwave sim/ula_8_bits_final.vcd
-   ```
-
-### Simulação da ULA de 8 bits Aprimorada
-
-1. **Compile os módulos e o testbench**:
-   ```bash
-   # Testbench comparativo
-   iverilog -g2012 -o ula_8_bits_enhanced.vvp rtl/ula_74181.sv rtl/ula_8_bits.sv rtl/ula_8_bits_enhanced.sv tb/tb_ula_8_bits_enhanced.sv
-   ```
-
-2. **Execute a simulação**:
-   ```bash
-   vvp sim/ula_8_bits_enhanced.vvp
-   ```
-
-3. **Visualize as formas de onda**:
-   ```bash
-   gtkwave sim/ula_8_bits_enhanced.vcd
+   gtkwave sim/ula_8_bits_datasheet.vcd
    ```
 
 ## Análise e Conclusões
 
-### Comparação entre as Implementações
+### Limitações da ULA de 8 bits
 
-A ULA de 8 bits original foi implementada combinando duas ULAs 74181 de 4 bits, com um mecanismo básico de propagação de carry. Embora esta abordagem funcione para muitas operações, ela apresenta limitações significativas em operações que dependem fortemente da propagação correta do carry ou borrow entre os nibbles.
+A ULA de 8 bits foi implementada combinando duas ULAs 74181 de 4 bits, com um mecanismo de propagação de carry. Esta abordagem funciona para muitas operações, mas apresenta limitações em operações que dependem fortemente da propagação correta do carry ou borrow entre os nibbles.
 
-A ULA de 8 bits aprimorada aborda esses problemas com:
-1. Melhor tratamento do carry entre os blocos de 4 bits
-2. Implementação especializada para operações críticas
-3. Correções específicas para operações como decrementos e subtrações
+Os testes mostram que a implementação atual tem dificuldades em:
+1. Operações de decremento com borrow entre nibbles
+2. Operações como `(A OR B) MINUS 1` em certos valores específicos
+3. Operações de subtração com carry propagado entre os nibbles
 
-Os resultados das simulações mostram claramente a melhoria: de 77 erros na implementação original para apenas 18 na versão aprimorada, representando uma redução de aproximadamente 76% nos casos de falha.
+### Operações Problemáticas
 
-### Operações Ainda Problemáticas
+As operações mais problemáticas são:
+- Operações com código S=0010 (`(A OR B) MINUS 1`)
+- Operações com código S=0011 (`MINUS 1` ou operações semelhantes)
+- Operações com código S=0101, S=1010, S=1011 e S=1111 em certos valores específicos
 
-Mesmo na implementação aprimorada, algumas operações ainda apresentam problemas:
-- Operações com código S=0010 (`(A OR B) MINUS 1`) em certos valores específicos
-- Operações com código S=0011 (`MINUS 1`) em algumas condições
-- Operações com código S=1010 (`(A OR ~B) PLUS (A AND B)`) com certos valores
+### Possíveis Melhorias
 
-Esses problemas estão relacionados a casos específicos de propagação de carry e poderiam ser resolvidos com um tratamento ainda mais especializado para cada operação.
+Para uma implementação mais robusta da ULA de 8 bits, seria recomendável:
+1. Implementar tratamento especial para operações problemáticas
+2. Revisar o mecanismo de propagação de carry entre os nibbles
+3. Considerar implementar diretamente as operações em 8 bits em vez de compor duas ULAs de 4 bits
 
-### Próximos Passos
-
-Para uma implementação perfeita, seria necessário:
-1. Analisar em detalhes cada caso de falha remanescente
-2. Implementar correções específicas para cada operação problemática
-3. Considerar uma abordagem completamente diferente para a ULA de 8 bits, possivelmente implementando diretamente todas as operações em 8 bits em vez de compor duas ULAs de 4 bits
-
-Esta implementação demonstra a complexidade de estender circuitos digitais e os desafios de garantir que todas as operações funcionem corretamente em todas as situações.
+Este projeto demonstra a complexidade de estender circuitos digitais e os desafios de garantir que todas as operações funcionem corretamente em todas as situações.
     
 2.  **Execute a simulação**:
     ```bash
