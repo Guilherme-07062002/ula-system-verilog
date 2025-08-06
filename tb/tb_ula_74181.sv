@@ -34,8 +34,8 @@ module tb_ula_74181;
         
         $display("=== Testbench ULA 74181 ===");
         $display("Testando todas as funcoes com validacao dos sinais P e G");
-        $display("Formato: Modo | S | A | B | Cin || F | A=B | Cout | P | G");
-        $display("--------------------------------------------------------");
+        $display("| Modo | S    |   A   |   B   | Cin |   F   | A=B | Cout | P | G |");
+        $display("|------|------|-------|-------|-----|-------|-----|------|---|---|");
         
         // Teste de todas as combinações de modo (M=0,1), seleção (S=0000-1111)
         // com alguns valores representativos para A, B e Cin
@@ -59,7 +59,7 @@ module tb_ula_74181;
                     endcase
                     
                     #10;
-                    $display("  %s  | %04b | %04b | %04b | %b || %04b | %b | %b | %b | %b", 
+                    $display("| %s | %04b | %04b | %04b |  %b  | %04b |  %b  |  %b   | %b | %b |", 
                             (m == 0) ? "ARI" : "LOG", s, a, b, c_in, f, a_eq_b, c_out, p, g);
                 end
             end

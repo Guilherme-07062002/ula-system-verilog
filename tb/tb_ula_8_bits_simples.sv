@@ -33,6 +33,8 @@ module tb_ula_8_bits_simples;
         $dumpvars(0, tb_ula_8_bits_simples);
         
         $display("=== Testando ULA de 8 bits - Casos Importantes ===");
+        $display("| Operação         |   M   |   S   |   A   |   B   | Cin |   F   | Cout | Overflow | A_EQ_B | P | G |");
+        $display("|------------------|-------|-------|-------|-------|-----|-------|------|----------|--------|---|---|");
         
         // Inicializa sinais
         a = 8'h00;
@@ -51,7 +53,7 @@ module tb_ula_8_bits_simples;
         a = 8'h05;
         b = 8'h03;
         #10;
-        $display("Adicao: %d + %d = %d, Cout=%b, Overflow=%b", a, b, f, c_out, overflow);
+        $display("| Adicao           |  %1b   | %04b  | %02h  | %02h  |  %1b  | %02h  |  %1b   |    %1b     |   %1b   | %1b | %1b |", m, s, a, b, c_in, f, c_out, overflow, a_eq_b, p, g);
         
         // 127 + 1 = 128 (teste de overflow positivo)
         a = 8'h7F;
@@ -59,6 +61,7 @@ module tb_ula_8_bits_simples;
         #10;
         $display("Adicao com overflow positivo: %d + %d = %d, Cout=%b, Overflow=%b", 
                  $signed(a), $signed(b), $signed(f), c_out, overflow);
+        $display("| Adicao ovf+      |  %1b   | %04b  | %02h  | %02h  |  %1b  | %02h  |  %1b   |    %1b     |   %1b   | %1b | %1b |", m, s, a, b, c_in, f, c_out, overflow, a_eq_b, p, g);
                  
         // 128 + 127 = 255 (outro teste de overflow)
         a = 8'h80;
@@ -66,6 +69,7 @@ module tb_ula_8_bits_simples;
         #10;
         $display("Adicao com overflow: %d + %d = %d, Cout=%b, Overflow=%b", 
                  $signed(a), $signed(b), $signed(f), c_out, overflow);
+        $display("| Adicao ovf       |  %1b   | %04b  | %02h  | %02h  |  %1b  | %02h  |  %1b   |    %1b     |   %1b   | %1b | %1b |", m, s, a, b, c_in, f, c_out, overflow, a_eq_b, p, g);
         
         // 255 + 1 = 0 (com carry)
         a = 8'hFF;
@@ -73,6 +77,7 @@ module tb_ula_8_bits_simples;
         #10;
         $display("Adicao com carry: %d + %d = %d, Cout=%b, Overflow=%b", 
                  a, b, f, c_out, overflow);
+        $display("| Adicao carry     |  %1b   | %04b  | %02h  | %02h  |  %1b  | %02h  |  %1b   |    %1b     |   %1b   | %1b | %1b |", m, s, a, b, c_in, f, c_out, overflow, a_eq_b, p, g);
         
         // Test Case 2: Subtração (A - B - 1 + Cin)
         m = 0;         // Modo aritmético
@@ -85,6 +90,7 @@ module tb_ula_8_bits_simples;
         #10;
         $display("\nSubtracao: %d - %d = %d, Cout=%b, Overflow=%b", 
                  a, b, f, c_out, overflow);
+        $display("| Subtracao        |  %1b   | %04b  | %02h  | %02h  |  %1b  | %02h  |  %1b   |    %1b     |   %1b   | %1b | %1b |", m, s, a, b, c_in, f, c_out, overflow, a_eq_b, p, g);
         
         // 0 - 1 = -1
         a = 8'h00;
@@ -92,6 +98,7 @@ module tb_ula_8_bits_simples;
         #10;
         $display("Subtracao: %d - %d = %d, Cout=%b, Overflow=%b", 
                  a, b, $signed(f), c_out, overflow);
+        $display("| Subtracao neg    |  %1b   | %04b  | %02h  | %02h  |  %1b  | %02h  |  %1b   |    %1b     |   %1b   | %1b | %1b |", m, s, a, b, c_in, f, c_out, overflow, a_eq_b, p, g);
         
         // -128 - 1 = 127 (overflow)
         a = 8'h80;
@@ -99,6 +106,7 @@ module tb_ula_8_bits_simples;
         #10;
         $display("Subtracao com overflow: %d - %d = %d, Cout=%b, Overflow=%b", 
                  $signed(a), $signed(b), $signed(f), c_out, overflow);
+        $display("| Subtracao ovf    |  %1b   | %04b  | %02h  | %02h  |  %1b  | %02h  |  %1b   |    %1b     |   %1b   | %1b | %1b |", m, s, a, b, c_in, f, c_out, overflow, a_eq_b, p, g);
         
         // Test Case 3: Operação Lógica (AND)
         m = 1;         // Modo lógico
@@ -109,6 +117,7 @@ module tb_ula_8_bits_simples;
         b = 8'h55;
         #10;
         $display("\nOperacao AND: 0x%h AND 0x%h = 0x%h", a, b, f);
+        $display("| AND              |  %1b   | %04b  | %02h  | %02h  |  %1b  | %02h  |  %1b   |    %1b     |   %1b   | %1b | %1b |", m, s, a, b, c_in, f, c_out, overflow, a_eq_b, p, g);
         
         // Test Case 4: Operação Lógica (OR)
         m = 1;         // Modo lógico
@@ -118,6 +127,7 @@ module tb_ula_8_bits_simples;
         b = 8'h55;
         #10;
         $display("Operacao OR: 0x%h OR 0x%h = 0x%h", a, b, f);
+        $display("| OR               |  %1b   | %04b  | %02h  | %02h  |  %1b  | %02h  |  %1b   |    %1b     |   %1b   | %1b | %1b |", m, s, a, b, c_in, f, c_out, overflow, a_eq_b, p, g);
         
         // Test Case 5: Operação Lógica (XOR)
         m = 1;         // Modo lógico
@@ -127,6 +137,7 @@ module tb_ula_8_bits_simples;
         b = 8'h55;
         #10;
         $display("Operacao XOR: 0x%h XOR 0x%h = 0x%h", a, b, f);
+        $display("| XOR              |  %1b   | %04b  | %02h  | %02h  |  %1b  | %02h  |  %1b   |    %1b     |   %1b   | %1b | %1b |", m, s, a, b, c_in, f, c_out, overflow, a_eq_b, p, g);
         
         // Test Case 6: Teste de igualdade
         m = 1;         // Modo lógico
@@ -137,12 +148,14 @@ module tb_ula_8_bits_simples;
         b = 8'h55;
         #10;
         $display("\nTeste de igualdade: A=%h, B=%h, A_EQ_B=%b", a, b, a_eq_b);
+        $display("| Igualdade        |  %1b   | %04b  | %02h  | %02h  |  %1b  | %02h  |  %1b   |    %1b     |   %1b   | %1b | %1b |", m, s, a, b, c_in, f, c_out, overflow, a_eq_b, p, g);
         
         // Valores diferentes
         a = 8'h55;
         b = 8'hAA;
         #10;
         $display("Teste de igualdade: A=%h, B=%h, A_EQ_B=%b", a, b, a_eq_b);
+        $display("| Igualdade dif    |  %1b   | %04b  | %02h  | %02h  |  %1b  | %02h  |  %1b   |    %1b     |   %1b   | %1b | %1b |", m, s, a, b, c_in, f, c_out, overflow, a_eq_b, p, g);
         
         // Test Case 7: Teste de Carry Look-ahead
         m = 0;         // Modo aritmético
@@ -154,12 +167,14 @@ module tb_ula_8_bits_simples;
         b = 8'hF0;
         #10;
         $display("\nTeste de Carry Look-ahead: A=%h, B=%h, P=%b, G=%b", a, b, p, g);
+        $display("| Carry P          |  %1b   | %04b  | %02h  | %02h  |  %1b  | %02h  |  %1b   |    %1b     |   %1b   | %1b | %1b |", m, s, a, b, c_in, f, c_out, overflow, a_eq_b, p, g);
         
         // Operação que deve ativar G
         a = 8'hFF;
         b = 8'h01;
         #10;
         $display("Teste de Carry Look-ahead: A=%h, B=%h, P=%b, G=%b", a, b, p, g);
+        $display("| Carry G          |  %1b   | %04b  | %02h  | %02h  |  %1b  | %02h  |  %1b   |    %1b     |   %1b   | %1b | %1b |", m, s, a, b, c_in, f, c_out, overflow, a_eq_b, p, g);
         
         $display("\n=== Simulacao Concluida ===");
         #100;

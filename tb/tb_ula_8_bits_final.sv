@@ -107,14 +107,10 @@ module tb_ula_8_bits_final;
             // Verificação comparando nossa implementação com as ULAs de referência
             if (f !== f_ref || c_out !== c_out_ref || a_eq_b !== a_eq_b_ref || 
                 p !== p_ref || g !== g_ref || overflow !== overflow_ref) begin
-                
                 errors = errors + 1;
-                
-                $display("ERRO: M=%b, S=%04b, A=%02h, B=%02h, Cin=%b", m_val, s_val, a_val, b_val, c_in_val);
-                $display("  ULA 8 bits:    F=%02h, Cout=%b, A_EQ_B=%b, P=%b, G=%b, OVF=%b", 
-                        f, c_out, a_eq_b, p, g, overflow);
-                $display("  Referencia:    F=%02h, Cout=%b, A_EQ_B=%b, P=%b, G=%b, OVF=%b", 
-                        f_ref, c_out_ref, a_eq_b_ref, p_ref, g_ref, overflow_ref);
+                $display("| %1b | %04b | %02h | %02h |  %1b  | %02h | %02h |  %1b   |    %1b     |  %1b  |   %1b    | ERRO |", m_val, s_val, a_val, b_val, c_in_val, f, f_ref, c_out, c_out_ref, overflow, overflow_ref);
+            end else begin
+                $display("| %1b | %04b | %02h | %02h |  %1b  | %02h | %02h |  %1b   |    %1b     |  %1b  |   %1b    | OK |", m_val, s_val, a_val, b_val, c_in_val, f, f_ref, c_out, c_out_ref, overflow, overflow_ref);
             end
         end
     endtask

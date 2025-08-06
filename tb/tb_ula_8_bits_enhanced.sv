@@ -160,33 +160,40 @@ module tb_ula_8_bits_enhanced;
             // Focamos em operações conhecidas como problemáticas na versão original
             if (m == 1'b0 && (s == 4'b1001 || s == 4'b0110 || s == 4'b0000 || 
                              s == 4'b0010 || s == 4'b0111 || s == 4'b1011)) begin
-                
                 bit orig_ok, enhanced_ok;
                 bit orig_match, enhanced_match;
-                
-                $display("Teste %0d: M=%b, S=%b, A=%h, B=%h, Cin=%b", total_tests, m, s, a, b, c_in);
-                $display("  Esperado: F=%h, Cout=%b", expected_f, expected_cout);
-                
+
                 orig_ok = (f == expected_f && c_out == expected_cout);
                 enhanced_ok = (f_enhanced == expected_f && c_out_enhanced == expected_cout);
-                
-                $display("  ULA Original: F=%h, Cout=%b %s", f, c_out, 
-                         orig_ok ? "(OK)" : "(Erro)");
-                $display("  ULA Aprimorada: F=%h, Cout=%b %s", f_enhanced, c_out_enhanced,
-                         enhanced_ok ? "(OK)" : "(Erro)");
-                
+
+                // Cabeçalho da tabela (apenas no primeiro teste)
+                if (total_tests == 1) begin
+                    $display("| Teste | M | S    |   A   |   B   | Cin | Esperado      | ULA Orig        | ULA Aprim      | Status |");
+                    $display("|-------|---|------|-------|-------|-----|---------------|-----------------|---------------|--------|");
+                end
+
+                // Status
+
+                // Exibição em formato de tabela (status calculado inline)
+                $display("| %5d | %1b | %4b | %5h | %5h |  %1b  | F=%2h,C=%1b | F=%2h,C=%1b %s | F=%2h,C=%1b %s | %s |",
+                    total_tests, m, s, a, b, c_in,
+                    expected_f, expected_cout,
+                    f, c_out, orig_ok ? "OK" : "ERRO",
+                    f_enhanced, c_out_enhanced, enhanced_ok ? "OK" : "ERRO",
+                    (orig_ok && enhanced_ok) ? "OK" :
+                    (!orig_ok && enhanced_ok) ? "Corrigido" :
+                    (!orig_ok && !enhanced_ok) ? "Erro" : "Diferença");
+
                 // Verificar se a versão aprimorada corrige o problema
                 orig_match = (f == expected_f && c_out == expected_cout);
                 enhanced_match = (f_enhanced == expected_f && c_out_enhanced == expected_cout);
-                
+
                 if (!orig_match && enhanced_match) begin
-                    $display("  => Correção bem-sucedida! A ULA aprimorada resolveu o problema.");
+                    // $display("  => Correção bem-sucedida! A ULA aprimorada resolveu o problema.");
                 end else if (!orig_match && !enhanced_match) begin
-                    $display("  => Ambas as implementações diferem do resultado esperado.");
+                    // $display("  => Ambas as implementações diferem do resultado esperado.");
                     errors = errors + 1;
                 end
-                
-                $display("");
             end
         end
     endtask
