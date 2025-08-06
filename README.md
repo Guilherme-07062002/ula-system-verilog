@@ -46,7 +46,7 @@ Esta implementação combina duas instâncias da ULA 74181 para criar uma ULA de
   - Suporte a operações de 8 bits completas
   - Sinais de carry look-ahead para integração em sistemas maiores
 
-- **Limitações identificadas**: Esta implementação apresenta problemas com algumas operações aritméticas específicas, principalmente aquelas que envolvem carry/borrow entre os nibbles (conjuntos de 4 bits). As simulações detalhadas mostram que aproximadamente 18 casos de teste de 384 falham.
+- **Limitações identificadas**: Esta implementação apresenta problemas com algumas operações aritméticas específicas, principalmente aquelas que envolvem carry/borrow entre os nibbles (conjuntos de 4 bits). As simulações detalhadas mostram que algumas operações, especialmente aquelas que envolvem carry/borrow entre os nibbles, podem apresentar resultados inconsistentes.
 
 ## Testbenches e Simulação
 
@@ -68,9 +68,9 @@ A pasta `sim/` contém os arquivos gerados durante a simulação:
 
 - **Arquivos VCD**: Arquivos de Change Dump que registram as alterações nos sinais durante a simulação. Estes podem ser visualizados usando ferramentas como GTKWave para análise detalhada das formas de onda.
   - `ula_74181.vcd`: Resultados da simulação da ULA de 4 bits
+  - `ula_74181_datasheet.vcd`: Resultados da simulação da ULA de 4 bits (testbench datasheet)
   - `ula_8_bits.vcd`: Resultados da simulação da ULA de 8 bits básica
-  - `ula_8_bits_enhanced.vcd`: Resultados da simulação da ULA de 8 bits aprimorada
-  - Outros arquivos VCD para diferentes configurações de teste
+  - `ula_8_bits_datasheet.vcd`: Resultados da simulação da ULA de 8 bits (testbench datasheet)
 
 - **Arquivos VVP**: Arquivos executáveis compilados pelo Icarus Verilog, prontos para serem executados para realizar a simulação.
 
@@ -116,14 +116,13 @@ Funcao S=1110 (Operação OR):
 | LOG | 1110 | 1010 | 0101 |  0  | 1111 |  0  |  0   | 0 | 1 |
 ```
 
-### ULA de 8 bits Original
+### ULA de 8 bits
 - Funciona corretamente para muitas operações básicas
 - Apresenta problemas com certas operações aritméticas, especialmente aquelas que envolvem carry/borrow entre os nibbles
-- Nos testes abrangentes (`tb_ula_8_bits_final.sv`), foram identificados 77 erros em 394 testes
 - Os problemas mais comuns ocorrem em operações de subtração e decremento
 
 #### Exemplo de Simulação da ULA de 8 bits
-Trecho da saída do `tb_ula_8_bits_final.sv` mostrando operações funcionando e falhas:
+Trecho da saída do `tb_ula_8_bits.sv` mostrando operações:
 
 ```
 Testando operacao: M=0, S=1001 (Adição A+B)
@@ -139,34 +138,6 @@ Testando operacao: M=0, S=0110 (Subtração A-B-1)
 | 0 | 0110 | 00 | 00 |  0  | ff | 0f |  1   |    0     |  0  |   0    | ERRO |
 | 0 | 0110 | aa | 55 |  0  | 54 | 44 |  0   |    0     |  1  |   1    | ERRO | <- Erro na subtração
 ```
-
-### ULA de 8 bits Aprimorada
-- Corrige muitos dos problemas da implementação original
-- Implementa tratamento especial para operações problemáticas como `(A OR B) MINUS 1` (S=0010) e `A MINUS 1` (S=0000)
-- Reduz significativamente o número de erros (18 falhas em 320 testes)
-- Ainda apresenta algumas inconsistências em operações específicas, principalmente com valores extremos ou condições de borda
-
-#### Exemplo de Simulação da ULA de 8 bits Aprimorada
-Trecho da saída do `tb_ula_8_bits_enhanced.sv` mostrando as melhorias:
-
-```
-=== Testando Casos Problemáticos ===
-A=7f + B=01 (Carry entre nibbles)
-  Esperado: F=80, Cout=0, Overflow=1
-  ULA Original: F=80, Cout=0, Overflow=1
-  ULA Aprimorada: F=80, Cout=0, Overflow=1
-
-A=10 - 1 (Decremento com borrow entre nibbles)
-  Esperado: F=0F
-  ULA Original: F=10  <- Falha no borrow entre nibbles
-  ULA Aprimorada: F=0f  <- Corrigido!
-
-Comparação em operação S=0010 ((A OR B) MINUS 1):
-|    24 | 0 | 0010 |    10 |    01 |  0  | F=10,C=0 | F=00,C=0 ERRO | F=10,C=0   OK |  Corrigido |
-|    30 | 0 | 0010 |    f0 |    0f |  0  | F=fe,C=0 | F=ee,C=0 ERRO | F=fe,C=0   OK |  Corrigido |
-```
-
-Os testes comparativos (`tb_ula_8_bits_enhanced.sv`) demonstram claramente as melhorias na versão aprimorada em relação à original, especialmente para operações que envolvem carry/borrow entre os nibbles. No exemplo acima, podemos ver que operações como decrementos com borrow entre nibbles e a operação `(A OR B) MINUS 1` foram corrigidas na implementação aprimorada.
 
 ## Como Executar as Simulações
 
@@ -352,17 +323,6 @@ Esta implementação verifica corretamente as condições de overflow em complem
 - Para adição: overflow ocorre quando dois números positivos resultam em negativo ou dois números negativos resultam em positivo
 - Para subtração: overflow ocorre quando subtrair um número negativo de um positivo resulta em negativo, ou subtrair um número positivo de um negativo resulta em positivo
 
-#### 4. Validação com Testbench Comparativo
-
-O testbench `tb_ula_8_bits_enhanced.sv` foi desenvolvido especificamente para:
-- Comparar o desempenho da ULA original e da ULA aprimorada
-- Verificar se as correções implementadas resolvem os casos problemáticos
-- Confirmar que a ULA aprimorada mantém o comportamento correto em todos os casos de teste
-
-### Como escolher a implementação adequada:
-
-* Use `ula_8_bits.sv` para casos simples ou quando a precisão em operações que atravessam nibbles não for crítica
-* Use `ula_8_bits_enhanced.sv` quando precisar de comportamento consistente com o datasheet em todas as operações
     
 2.  **Execute a simulação**:
     ```bash
@@ -370,12 +330,16 @@ O testbench `tb_ula_8_bits_enhanced.sv` foi desenvolvido especificamente para:
     ```
     ou
     ```bash
-    vvp sim/ula_8_bits_final.vvp
+    vvp sim/ula_8_bits_datasheet.vvp
     ```
     
 3.  **Visualize as formas de onda**:
     ```bash
     gtkwave sim/ula_8_bits.vcd
+    ```
+    ou
+    ```bash
+    gtkwave sim/ula_8_bits_datasheet.vcd
     ```
 
 -----
@@ -464,24 +428,6 @@ iverilog -g2012 -o sim/ula_8_bits_datasheet.vvp rtl/ula_74181.sv rtl/ula_8_bits.
 vvp sim/ula_8_bits_datasheet.vvp
 ```
 
-**Testbench final (100% cobertura):**
-```bash
-# Compile o testbench final com 100% de cobertura
-iverilog -g2012 -o sim/ula_8_bits_final.vvp rtl/ula_74181.sv rtl/ula_8_bits.sv tb/tb_ula_8_bits_final.sv
-
-# Execute a simulação
-vvp sim/ula_8_bits_final.vvp
-```
-
-**Testbench simples:**
-```bash
-# Compile o testbench
-iverilog -g2012 -o sim/ula_8_bits_simples.vvp rtl/ula_74181.sv rtl/ula_8_bits.sv tb/tb_ula_8_bits_simples.sv
-
-# Execute a simulação
-vvp sim/ula_8_bits_simples.vvp
-```
-
 ## Importância e Propósito dos Múltiplos Testbenches
 
 Este projeto utiliza uma abordagem progressiva de verificação através de múltiplos testbenches, cada um com um propósito específico. Esta estratégia permite uma validação robusta e em camadas, desde testes rápidos até verificações exaustivas.
@@ -523,13 +469,7 @@ Este projeto utiliza uma abordagem progressiva de verificação através de múl
    - **Vantagem**: Execução rápida e feedback imediato sobre a estrutura
    - **Quando usar**: Ao implementar a ULA de 8 bits e modificar sua arquitetura
 
-2. **tb_ula_8_bits_simples.sv** - *Testbench Simples*:
-   - **Propósito**: Testes rápidos e focados em operações específicas
-   - **Características**: Conjunto reduzido de testes, focado em casos problemáticos
-   - **Vantagem**: Ideal para depuração de problemas específicos
-   - **Quando usar**: Durante a depuração de operações particulares ou bugs específicos
-
-3. **tb_ula_8_bits_datasheet.sv** - *Testbench Datasheet*:
+2. **tb_ula_8_bits_datasheet.sv** - *Testbench Datasheet*:
    - **Propósito**: Validar a ULA de 8 bits conforme especificações adaptadas do datasheet
    - **Características**: Testes de conformidade para operações adaptadas para 8 bits
    - **Vantagem**: Garante comportamento consistente com as especificações estendidas
@@ -587,55 +527,36 @@ Ao expandir a ULA 74181 de 4 bits para 8 bits, o projeto utiliza duas ULAs de 4 
 - **Isso é esperado e documentado**: Muitos projetos didáticos e até aplicações reais enfrentam essa limitação ao expandir ULAs de 4 bits para 8 bits usando ripple carry.
 
 
-#### Exemplos práticos de divergência e correções na ULA Aprimorada
+#### Exemplos práticos de divergência na ULA de 8 bits
 
-Veja alguns exemplos reais em que a ULA de 8 bits construída com ripple carry apresenta resultado diferente do esperado, e como a versão aprimorada corrige esses problemas:
+Veja alguns exemplos reais em que a ULA de 8 bits construída com ripple carry apresenta resultado diferente do esperado:
 
 - **Exemplo 1: Adição com carry entre nibbles**
   - Entradas: `A = 8'h7F`, `B = 8'h01`, `S = 4'b1001` (A + B), `M = 0`, `Cin = 0`
   - Resultado esperado (ideal): F = 80, Cout = 0, Overflow = 1
-  - Resultado ULA original: F = 80, Cout = 0, Overflow = 1 (Neste caso funciona corretamente)
-  - Resultado ULA aprimorada: F = 80, Cout = 0, Overflow = 1
-  - **O que foi corrigido**: A ULA aprimorada garante que este caso funcione consistentemente, mesmo para variações de entrada, usando carry look-ahead.
+  - Resultado ULA: F = 80, Cout = 0, Overflow = 1 (Neste caso funciona corretamente)
 
 - **Exemplo 2: Adição com carry out**
   - Entradas: `A = 8'hFF`, `B = 8'h01`, `S = 4'b1001` (A + B), `M = 0`, `Cin = 0`
   - Resultado esperado (ideal): F = 00, Cout = 1
-  - Resultado ULA original: F = 00, Cout = 1
-  - Resultado ULA aprimorada: F = 00, Cout = 1
-  - **O que foi corrigido**: Assegurada a geração correta do carry out para adições que ultrapassam 8 bits.
+  - Resultado ULA: F = 00, Cout = 1 (Correto)
 
 - **Exemplo 3: Operação (A OR B) MINUS 1**
   - Entradas: `A = 8'h10`, `B = 8'h01`, `S = 4'b0010` ((A OR B) - 1), `M = 0`, `Cin = 0`
   - Resultado esperado (ideal): F = 10 (0x11 - 1 = 0x10)
-  - Resultado ULA original: F = 00 (incorreto)
-  - Resultado ULA aprimorada: F = 10 (correto)
-  - **O que foi corrigido**: Implementada correção específica que calcula diretamente `(a | b) - 8'h01` para este caso.
+  - Resultado ULA: F = 00 (incorreto)
 
 - **Exemplo 4: Operação A MINUS 1 (decremento)**
   - Entradas: `A = 8'h40`, `B = 8'h00`, `S = 4'b0000` (A - 1), `M = 0`, `Cin = 1`
   - Resultado esperado (ideal): F = 3F
-  - Resultado ULA original: F = 40 (incorreto - não faz o decremento corretamente)
-  - Resultado ULA aprimorada: F = 3F (correto)
-  - **O que foi corrigido**: Implementada correção específica que calcula diretamente `a - 8'h01` para decrementos.
+  - Resultado ULA: F = 40 (incorreto - não faz o decremento corretamente)
 
 - **Exemplo 5: Decremento com borrow entre nibbles**
   - Entradas: `A = 8'h10`, `B = 8'h00`, `S = 4'b0000` (A - 1), `M = 0`, `Cin = 1`
   - Resultado esperado (ideal): F = 0F
-  - Resultado ULA original: F = 10 (incorreto - não propaga o borrow entre nibbles)
-  - Resultado ULA aprimorada: F = 0F (correto)
-  - **O que foi corrigido**: A correção de decremento trata corretamente o caso onde é necessário "emprestar" do nibble mais significativo.
+  - Resultado ULA: F = 10 (incorreto - não propaga o borrow entre nibbles)
 
-Esses exemplos demonstram como a ULA aprimorada soluciona os casos problemáticos que a ULA original não conseguia tratar corretamente, especialmente em operações aritméticas que envolvem carry/borrow entre os nibbles. Para operações lógicas, ambas as implementações continuam apresentando o mesmo comportamento correto.
-
-#### Resultados dos Testes Comparativos
-
-Os testes realizados no `tb_ula_8_bits_enhanced.sv` mostram que:
-
-- De 48 casos de teste, a ULA original falha em 2 casos específicos (relacionados à operação S=0010)
-- A ULA aprimorada passa em todos os 48 casos de teste
-- Ambas as implementações têm comportamento idêntico para operações lógicas
-- A principal diferença está nas operações aritméticas que envolvem carry/borrow entre nibbles
+Esses exemplos demonstram as limitações da ULA de 8 bits implementada, especialmente em operações aritméticas que envolvem carry/borrow entre os nibbles. Para operações lógicas, a implementação geralmente apresenta o comportamento correto.
 
 ## Scripts de Build
 
