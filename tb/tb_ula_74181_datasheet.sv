@@ -207,11 +207,15 @@ module tb_ula_74181_datasheet;
             test_pass = (f === expected_f) && (c_out === expected_cout) && 
                         (p === expected_p) && (g === expected_g);
             
+            // Exibir resultados em formato de tabela
+            $display("| %s | %04b | %04b | %04b |  %b  | %04b |  %b  |  %b   | %b | %b |  %s  |", 
+                    (m == 0) ? "ARI" : "LOG", s, a, b, c_in, f, a_eq_b, c_out, p, g,
+                    test_pass ? "PASS" : "FAIL");
+            
+            // Se houver erro, mostrar informações adicionais
             if (!test_pass) begin
                 errors = errors + 1;
-                $display("ERRO: M=%b, S=%b, A=%b, B=%b, Cin=%b", m, s, a, b, c_in);
-                $display("  Obtido: F=%b, Cout=%b, P=%b, G=%b", f, c_out, p, g);
-                $display("  Esperado: F=%b, Cout=%b, P=%b, G=%b", expected_f, expected_cout, expected_p, expected_g);
+                $display("  ERRO: Esperado: F=%04b, Cout=%b, P=%b, G=%b", expected_f, expected_cout, expected_p, expected_g);
             end
         end
     endtask
@@ -227,18 +231,25 @@ module tb_ula_74181_datasheet;
         errors = 0;
         total_tests = 0;
         
+        // Cabeçalho da tabela para facilitar a leitura dos resultados
+        $display("| Modo | S    |   A   |   B   | Cin |   F   | A=B | Cout | P | G | Status |");
+        $display("|------|------|-------|-------|-----|-------|-----|------|---|---|--------|");
+        
         // Testamos cada função com diferentes valores de entradas
         for (int mode = 0; mode <= 1; mode = mode + 1) begin
             m = mode;
             $display("\n=== MODO %s (M=%0d) ===", (m == 0) ? "ARITMETICO" : "LOGICO", m);
+            $display("| Modo | S    |   A   |   B   | Cin |   F   | A=B | Cout | P | G | Status |");
+            $display("|------|------|-------|-------|-----|-------|-----|------|---|---|--------|");
             
             for (int func = 0; func < 16; func = func + 1) begin
                 s = func[3:0];
-                $display("Funcao S=%04b:", s);
+                $display("\nFuncao S=%04b:", s);
+                $display("| Modo | S    |   A   |   B   | Cin |   F   | A=B | Cout | P | G | Status |");
+                $display("|------|------|-------|-------|-----|-------|-----|------|---|---|--------|");
                 
                 for (int cin_val = 0; cin_val <= 1; cin_val = cin_val + 1) begin
                     c_in = cin_val;
-                    $display("  Cin=%b:", c_in);
                     
                     // Testamos alguns casos representativos
                     verify_operation(s, 4'h0, 4'h0, m, c_in);  // Zeros
@@ -252,10 +263,11 @@ module tb_ula_74181_datasheet;
         end
         
         // Exibimos o resultado final
+        $display("\n=== Resultado Final ===");
         if (errors == 0) begin
-            $display("\n=== TODOS OS TESTES PASSARAM! (%0d testes) ===", total_tests);
+            $display("=== TODOS OS TESTES PASSARAM! (%0d testes) ===", total_tests);
         end else begin
-            $display("\n=== %0d ERROS em %0d testes! ===", errors, total_tests);
+            $display("=== %0d ERROS em %0d testes! ===", errors, total_tests);
         end
         
         $display("\n=== Simulacao Concluida ===");
