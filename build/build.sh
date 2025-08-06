@@ -1,9 +1,6 @@
 #!/bin/bash
 # Script de construção para compilar e executar os testbenches
 
-# Imprimir os comandos ao executá-los para depuração
-set -x
-
 # Obter o diretório atual e o diretório base do projeto
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 PROJECT_DIR=$(dirname "$SCRIPT_DIR")
@@ -42,16 +39,104 @@ compile_and_run() {
     echo
 }
 
-# Testbench ULA 74181 básico
-compile_and_run "ula_74181" "$RTL_DIR/ula_74181.sv" "$TB_DIR/tb_ula_74181.sv"
+# Função para exibir o menu principal
+show_main_menu() {
+    echo "===== MENU DE TESTES ULA ====="
+    echo "1. ULA de 4 bits (74181)"
+    echo "2. ULA de 8 bits"
+    echo "3. Sair"
+    echo "============================="
+    echo "Escolha uma opção: "
+}
 
-# Testbench ULA 74181 Datasheet
-compile_and_run "ula_74181_datasheet" "$RTL_DIR/ula_74181.sv" "$TB_DIR/tb_ula_74181_datasheet.sv"
+# Função para exibir o submenu
+show_submenu() {
+    local ula_name=$1
+    echo "===== TESTES PARA $ula_name ====="
+    echo "1. Teste Simples"
+    echo "2. Teste Datasheet (completo)"
+    echo "3. Voltar"
+    echo "============================="
+    echo "Escolha uma opção: "
+}
 
-# Testbench ULA 8 bits básico
-compile_and_run "ula_8_bits" "$RTL_DIR/ula_74181.sv" "$RTL_DIR/ula_8_bits.sv" "$TB_DIR/tb_ula_8_bits.sv"
+# Função para executar os testes da ULA de 4 bits (74181)
+run_ula_4bits() {
+    local option=$1
+    case $option in
+        1) # Teste Simples
+            compile_and_run "ula_74181" "$RTL_DIR/ula_74181.sv" "$TB_DIR/tb_ula_74181.sv"
+            ;;
+        2) # Teste Datasheet
+            compile_and_run "ula_74181_datasheet" "$RTL_DIR/ula_74181.sv" "$TB_DIR/tb_ula_74181_datasheet.sv"
+            ;;
+        *) 
+            echo "Opção inválida!"
+            ;;
+    esac
+}
 
-# Testbench ULA 8 bits Datasheet
-compile_and_run "ula_8_bits_datasheet" "$RTL_DIR/ula_74181.sv" "$RTL_DIR/ula_8_bits.sv" "$TB_DIR/tb_ula_8_bits_datasheet.sv"
+# Função para executar os testes da ULA de 8 bits
+run_ula_8bits() {
+    local option=$1
+    case $option in
+        1) # Teste Simples
+            compile_and_run "ula_8_bits" "$RTL_DIR/ula_74181.sv" "$RTL_DIR/ula_8_bits.sv" "$TB_DIR/tb_ula_8_bits.sv"
+            ;;
+        2) # Teste Datasheet
+            compile_and_run "ula_8_bits_datasheet" "$RTL_DIR/ula_74181.sv" "$RTL_DIR/ula_8_bits.sv" "$TB_DIR/tb_ula_8_bits_datasheet.sv"
+            ;;
+        *) 
+            echo "Opção inválida!"
+            ;;
+    esac
+}
 
-echo "=== Todos os testbenches foram compilados e executados ==="
+# Loop principal do menu
+while true; do
+    clear
+    show_main_menu
+    read -r main_option
+    
+    case $main_option in
+        1) # ULA de 4 bits
+            while true; do
+                show_submenu "ULA DE 4 BITS (74181)"
+                read -r sub_option
+                
+                if [ "$sub_option" == "3" ]; then
+                    break
+                fi
+                
+                run_ula_4bits "$sub_option"
+                echo "Pressione ENTER para continuar..."
+                read -r
+            done
+            ;;
+            
+        2) # ULA de 8 bits
+            while true; do
+                show_submenu "ULA DE 8 BITS"
+                read -r sub_option
+                
+                if [ "$sub_option" == "3" ]; then
+                    break
+                fi
+                
+                run_ula_8bits "$sub_option"
+                echo "Pressione ENTER para continuar..."
+                read -r
+            done
+            ;;
+            
+        3) # Sair
+            echo "Saindo do programa..."
+            exit 0
+            ;;
+            
+        *)
+            echo "Opção inválida! Pressione ENTER para continuar..."
+            read -r
+            ;;
+    esac
+done
