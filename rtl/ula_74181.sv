@@ -157,12 +157,13 @@ module ula_74181 (
             
             // Tratamento do carry-out conforme exatamente a tabela do datasheet SN74LS181
             // O comportamento do carry varia conforme o código da operação S
+            // Para operações de subtração (ou decrementação), o carry é invertido
             case (s)
                 // Operações com carry complementado (subtração ou outras operações específicas)
-                4'b0000: c_out = ~sum_arith[4]; // A MINUS 1
+                4'b0000: c_out = ~sum_arith[4]; // A MINUS 1 (decremento)
                 4'b0010: c_out = ~sum_arith[4]; // (A OR B) MINUS 1
                 4'b0011: c_out = ~sum_arith[4]; // MINUS 1
-                4'b0110: c_out = ~sum_arith[4]; // A MINUS B MINUS 1
+                4'b0110: c_out = ~sum_arith[4]; // A MINUS B MINUS 1 (subtração)
                 4'b0111: c_out = ~sum_arith[4]; // (A AND ~B) MINUS 1
                 4'b1011: c_out = ~sum_arith[4]; // (A AND B) MINUS 1
                 

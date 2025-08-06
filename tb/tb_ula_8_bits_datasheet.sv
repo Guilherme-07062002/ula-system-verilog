@@ -11,6 +11,7 @@ module tb_ula_8_bits_datasheet;
     wire [7:0] f;
     wire a_eq_b, c_out, overflow;
     wire p, g; // Sinais de propagação e geração de carry
+    wire c_intermediate; // Carry intermediário entre as ULAs
     
     // Instanciação da ULA de 8 bits
     ula_8_bits uut (
@@ -24,7 +25,8 @@ module tb_ula_8_bits_datasheet;
         .c_out(c_out),
         .overflow(overflow),
         .p(p),
-        .g(g)
+        .g(g),
+        .c_intermediate(c_intermediate) // Monitorando carry entre ULAs
     );
     
     // Variáveis para a verificação
@@ -261,7 +263,7 @@ module tb_ula_8_bits_datasheet;
     task test_ripple_carry;
         begin
             $display("\n=== Testando Ripple Carry ===");
-            $display("| Modo | S    |   A   |   B   | Cin |   F   | Cout | Overflow | Status | Descrição |");
+            $display("| Modo | S    |   A   |   B   | Cin |   F   | Cout | Overflow | Status | Descricao |");
             $display("|------|------|-------|-------|-----|-------|------|----------|--------|-----------|");
             
             // Adição de dois números de 8 bits que gera carry
@@ -296,6 +298,12 @@ module tb_ula_8_bits_datasheet;
         end
     endtask
     
+    // Configuração do $monitor para exibir valores importantes a cada mudança
+    initial begin
+        // $monitor("Tempo=%0t: m=%b s=%04b a=%02h b=%02h c_in=%b -> f=%02h c_out=%b c_intermediate=%b a_eq_b=%b overflow=%b", 
+        //          $time, m, s, a, b, c_in, f, c_out, c_intermediate, a_eq_b, overflow);
+    end
+
     initial begin
         // Configuração para gerar arquivo VCD na pasta sim/
         $dumpfile("../sim/ula_8_bits_datasheet.vcd");
@@ -339,6 +347,44 @@ module tb_ula_8_bits_datasheet;
         
         // Testes específicos para ripple carry e overflow
         test_ripple_carry();
+        
+        // Testes adicionais específicos para problemas com carry/borrow
+        $display("\n=== Testes Específicos para Operacoes Problematicas ===");
+        $display("| Modo | S    |   A   |   B   | Cin |   F   | Cout | C_Int | Status | Descricao |");
+        $display("|------|------|-------|-------|-----|-------|------|-------|--------|-----------|");
+        
+        // Modo aritmético - operações problemáticas
+        m = 0; // Aritmético
+        
+        // S=0000 (A-1) - Teste que força borrow entre nibbles
+        s = 4'b0000;
+        c_in = 0;
+        a = 8'h10; b = 8'h00;
+        #10;
+        $display("| ARI  | %04b | %02h | %02h |  %b  | %02h |  %b   |   %b   |  ---  | A-1 com borrow |",
+                s, a, b, c_in, f, c_out, c_intermediate);
+        
+        // S=0010 ((A|B)-1) - Teste que força borrow entre nibbles
+        s = 4'b0010;
+        a = 8'h10; b = 8'h00;
+        #10;
+        $display("| ARI  | %04b | %02h | %02h |  %b  | %02h |  %b   |   %b   |  ---  | (A|B)-1 com borrow |",
+                s, a, b, c_in, f, c_out, c_intermediate);
+                
+        // S=0110 (A-B-1) - Teste com valores que exigem propagação do borrow
+        s = 4'b0110;
+        a = 8'hAA; b = 8'h55;
+        #10;
+        $display("| ARI  | %04b | %02h | %02h |  %b  | %02h |  %b   |   %b   |  ---  | A-B-1 |",
+                s, a, b, c_in, f, c_out, c_intermediate);
+                
+        // S=0110 (A-B-1) com carry in = 1 (equivale a A-B)
+        s = 4'b0110;
+        c_in = 1'b1;
+        a = 8'hAA; b = 8'h55;
+        #10;
+        $display("| ARI  | %04b | %02h | %02h |  %b  | %02h |  %b   |   %b   |  ---  | A-B (c_in=1) |",
+                s, a, b, c_in, f, c_out, c_intermediate);
         
         // Exibimos o resultado final
         if (errors == 0) begin

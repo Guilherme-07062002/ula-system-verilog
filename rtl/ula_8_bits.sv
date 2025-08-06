@@ -9,16 +9,17 @@ module ula_8_bits (
     output wire       c_out,
     output wire       overflow,  // Sinal de overflow para aritmética de complemento a dois
     output wire       p,         // Propagação de carry para toda a ULA de 8 bits
-    output wire       g          // Geração de carry para toda a ULA de 8 bits
+    output wire       g,         // Geração de carry para toda a ULA de 8 bits
+    output wire       c_intermediate // Carry entre as ULAs de 4 bits (para depuração)
 );
 
     // Sinais internos para cascateamento das ULAs de 4 bits
     wire [3:0] f_lsb; // Saída da ULA dos 4 bits menos significativos
-    wire       c_out_lsb; // Carry Out da ULA dos 4 bits menos significativos
+    // c_intermediate já foi declarado como porta de saída
     wire       a_eq_b_lsb; // A=B da ULA dos 4 bits menos significativos
 
     wire [3:0] f_msb; // Saída da ULA dos 4 bits mais significativos
-    wire       c_out_msb; // Carry Out da ULA dos 4 bits mais significativos
+    wire       c_out_msb; // Carry Out da ULA dos 4 bits mais significativos (não usado)
     wire       a_eq_b_msb; // A=B da ULA dos 4 bits mais significativos
 
     // Sinais para carry look-ahead (P e G)
@@ -33,26 +34,21 @@ module ula_8_bits (
         .c_in(c_in),
         .f(f_lsb),
         .a_eq_b(a_eq_b_lsb),
-        .c_out(c_out_lsb),
+        .c_out(c_intermediate), // Renomeado para melhor clareza
         .p(p_lsb),
         .g(g_lsb)
     );
 
-    // Lógica de carry look-ahead para melhor desempenho
-    wire carry_msb;
-    
-    // Calculamos o carry para o bloco MSB usando a lógica de carry look-ahead
-    // carry_msb = g_lsb | (p_lsb & c_in)
-    assign carry_msb = g_lsb | (p_lsb & c_in);
+    // Conexão direta do carry_out da ULA LSB para o c_in da ULA MSB (ripple carry)
     
     // Instanciação da ULA para os 4 bits mais significativos (MSB)
-    // Agora usando carry look-ahead em vez de ripple carry
+    // Usando ripple carry (conexão direta do c_out do LSB ao c_in do MSB)
     ula_74181 ula_msb (
         .a(a[7:4]),
         .b(b[7:4]),
         .s(s),
         .m(m),
-        .c_in(carry_msb), // Usando carry look-ahead em vez de ripple carry
+        .c_in(c_intermediate), // Conexão do ripple carry
         .f(f_msb),
         .a_eq_b(a_eq_b_msb),
         .c_out(c_out),    // O carry_out do MSB é o carry_out final
@@ -64,6 +60,7 @@ module ula_8_bits (
     assign f = {f_msb, f_lsb}; // Concatenação das saídas
 
     // A saída a_eq_b para 8 bits é ativa se ambos os módulos de 4 bits indicarem igualdade
+    // Garantimos que seja a AND entre os dois sinais conforme solicitado
     assign a_eq_b = a_eq_b_lsb & a_eq_b_msb;
     
     // Detecção de overflow para aritmética em complemento a dois
