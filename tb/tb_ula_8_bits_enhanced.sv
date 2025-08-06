@@ -157,11 +157,10 @@ module tb_ula_8_bits_enhanced;
             end
             
             // Comparamos os resultados da implementação original e aprimorada com o esperado
-            // Focamos em operações conhecidas como problemáticas na versão original
-            if (m == 1'b0 && (s == 4'b1001 || s == 4'b0110 || s == 4'b0000 || 
-                             s == 4'b0010 || s == 4'b0111 || s == 4'b1011)) begin
-                bit orig_ok, enhanced_ok;
-                bit orig_match, enhanced_match;
+            // Testamos todas as operações, não apenas as problemáticas
+            begin
+                reg orig_ok, enhanced_ok;
+                reg orig_match, enhanced_match;
 
                 orig_ok = (f == expected_f && c_out == expected_cout);
                 enhanced_ok = (f_enhanced == expected_f && c_out_enhanced == expected_cout);
@@ -281,17 +280,36 @@ module tb_ula_8_bits_enhanced;
         // Testamos casos específicos que demonstram as diferenças entre as implementações
         test_problematic_cases();
         
-        // Testamos casos mais gerais
-        for (int i = 0; i < 16; i = i + 1) begin
-            s = i[3:0];
-            
-            // Modo aritmético (M=0)
-            m = 1'b0;
-            
-            // Casos com valores que podem causar carry/borrow entre nibbles
-            verify_operation(s, 8'h0F, 8'h01, m, 1'b0); // A+B com carry entre nibbles
-            verify_operation(s, 8'h10, 8'h01, m, 1'b0); // A-B com borrow entre nibbles
-            verify_operation(s, 8'h80, 8'h01, m, 1'b0); // Overflow potencial
+        $display("\n=== Testando Todas as Operações ===");
+        $display("Testando modo aritmético (M=0) e modo lógico (M=1) com diferentes valores de entrada");
+        
+        // Testamos todas as operações em ambos os modos (aritmético e lógico)
+        for (integer m_val = 0; m_val <= 1; m_val = m_val + 1) begin
+            for (integer i = 0; i < 16; i = i + 1) begin
+                s = i[3:0];
+                m = m_val[0];
+                
+                // Teste com diferentes valores de entrada e carry-in
+                // 1. Valores pequenos sem carry/borrow
+                verify_operation(s, 8'h02, 8'h03, m, 1'b0);
+                verify_operation(s, 8'h02, 8'h03, m, 1'b1);
+                
+                // 2. Casos com carry/borrow entre nibbles
+                verify_operation(s, 8'h0F, 8'h01, m, 1'b0);
+                verify_operation(s, 8'h10, 8'h01, m, 1'b0);
+                
+                // 3. Casos de overflow potencial
+                verify_operation(s, 8'h7F, 8'h01, m, 1'b0);
+                verify_operation(s, 8'h80, 8'h80, m, 1'b0);
+                
+                // 4. Casos com carry out
+                verify_operation(s, 8'hFF, 8'h01, m, 1'b0);
+                verify_operation(s, 8'hFF, 8'hFF, m, 1'b0);
+                
+                // 5. Padrões de bit interessantes
+                verify_operation(s, 8'hAA, 8'h55, m, 1'b0);
+                verify_operation(s, 8'hF0, 8'h0F, m, 1'b0);
+            end
         end
         
         // Exibimos o resultado final
