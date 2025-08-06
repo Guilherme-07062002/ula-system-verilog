@@ -245,9 +245,9 @@ module tb_ula_8_bits_datasheet;
                 
                 if (is_ripple_carry_limitation) begin
                     // É uma limitação da arquitetura ripple carry, não é um erro real do design
-                    $display("  AVISO - Limitação da Arquitetura Ripple Carry");
+                    $display("  AVISO - Limitacao da Arquitetura Ripple Carry");
                     $display("  Esperado pelo Datasheet: F=%h, Cout=%b, Overflow=%b", expected_f, expected_cout, expected_overflow);
-                    $display("  Esta diferença é esperada devido à arquitetura ripple carry entre as ULAs de 4 bits");
+                    $display("  Esta diferenca e esperada devido a arquitetura ripple carry entre as ULAs de 4 bits");
                     // Não incrementamos o contador de erros para limitações conhecidas
                 end else begin
                     errors = errors + 1;
