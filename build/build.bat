@@ -32,13 +32,15 @@ cls
 echo ===== MENU DE TESTES ULA =====
 echo 1. ULA de 4 bits (74181)
 echo 2. ULA de 8 bits
-echo 3. Sair
+echo 3. Visualizar ondas ^(GTKWave^)
+echo 4. Sair
 echo =============================
 set /p main_option=Escolha uma opcao: 
 
 if "%main_option%"=="1" goto menu_ula_4bits
 if "%main_option%"=="2" goto menu_ula_8bits
-if "%main_option%"=="3" goto exit
+if "%main_option%"=="3" goto menu_gtkwave
+if "%main_option%"=="4" goto exit
 echo Opcao invalida! Pressione qualquer tecla para continuar...
 pause > nul
 goto main_menu
@@ -97,3 +99,41 @@ exit /b 0
 
 REM Inicia o programa no menu principal
 goto main_menu
+
+:menu_gtkwave
+cls
+echo ===== VISUALIZAR ONDAS ^(GTKWave^) =====
+echo 1. 74181 ^(ula_74181.vcd^)
+echo 2. 74181 - Datasheet ^(ula_74181_datasheet.vcd^)
+echo 3. ULA 8 bits ^(ula_8_bits.vcd^)
+echo 4. ULA 8 bits - Datasheet ^(ula_8_bits_datasheet.vcd^)
+echo 5. Voltar
+echo ======================================
+set /p gw_option=Escolha uma opcao: 
+
+if "%gw_option%"=="1" call :open_vcd "ula_74181.vcd" & pause & goto menu_gtkwave
+if "%gw_option%"=="2" call :open_vcd "ula_74181_datasheet.vcd" & pause & goto menu_gtkwave
+if "%gw_option%"=="3" call :open_vcd "ula_8_bits.vcd" & pause & goto menu_gtkwave
+if "%gw_option%"=="4" call :open_vcd "ula_8_bits_datasheet.vcd" & pause & goto menu_gtkwave
+if "%gw_option%"=="5" goto main_menu
+echo Opcao invalida! Pressione qualquer tecla para continuar...
+pause > nul
+goto menu_gtkwave
+
+:open_vcd
+set VCD_FILE=%SIM_DIR%\%~1
+if exist "%VCD_FILE%" (
+    where gtkwave >nul 2>&1
+    if %ERRORLEVEL% NEQ 0 (
+        echo GTKWave nao encontrado no PATH. Instale o GTKWave ou adicione-o ao PATH.
+        echo Baixe em: http://gtkwave.sourceforge.net/
+        goto :eof
+    )
+    echo Abrindo %VCD_FILE% no GTKWave...
+    start "GTKWave" gtkwave "%VCD_FILE%"
+    goto :eof
+) else (
+    echo Arquivo nao encontrado: %VCD_FILE%
+    echo Execute o teste correspondente antes para gerar o VCD.
+    goto :eof
+)
