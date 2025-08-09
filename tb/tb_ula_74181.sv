@@ -26,7 +26,7 @@ module tb_ula_74181;
 
     // Referência/esperados
     reg [3:0] expected_f;
-    reg expected_cout, expected_p, expected_g;
+    reg expected_cout, expected_p, expected_g, expected_eq;
     reg test_pass;
     integer errors, total_tests;
 
@@ -176,14 +176,15 @@ module tb_ula_74181;
                 expected_p = calculate_expected_p(a, op_result, m);
                 expected_g = calculate_expected_g(a, op_result, m);
             end
-            test_pass = (f === expected_f) && (c_out === expected_cout) && 
-                        (p === expected_p) && (g === expected_g);
+        expected_eq = (a == b);
+        test_pass = (f === expected_f) && (c_out === expected_cout) && 
+            (p === expected_p) && (g === expected_g) && (a_eq_b === expected_eq);
             $display("| %s | %04b | %04b | %04b |  %b  | %04b |  %b  |  %b   | %b | %b |  %s  |", 
                     (m == 0) ? "ARI" : "LOG", s, a, b, c_in, f, a_eq_b, c_out, p, g,
                     test_pass ? "PASS" : "FAIL");
             if (!test_pass) begin
                 errors = errors + 1;
-                $display("  ERRO: Esperado: F=%04b, Cout=%b, P=%b, G=%b", expected_f, expected_cout, expected_p, expected_g);
+        $display("  ERRO: Esperado: F=%04b, Cout=%b, P=%b, G=%b, A=B=%b", expected_f, expected_cout, expected_p, expected_g, expected_eq);
             end
         end
     endtask
