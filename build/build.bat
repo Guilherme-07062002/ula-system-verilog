@@ -20,7 +20,10 @@ REM Função para compilar e executar um testbench
     iverilog -g2012 -o "%SIM_DIR%\%~1.vvp" %~2 %~3 %~4
     if %ERRORLEVEL% EQU 0 (
         echo === Executando %~1 ===
-        vvp "%SIM_DIR%\%~1.vvp"
+        REM Executa a partir de tb/ para que $dumpfile("../sim/...\") gere em sim/
+        pushd "%TB_DIR%"
+        vvp "..\sim\%~1.vvp"
+        popd
     ) else (
         echo Erro na compilação de %~1 ^(código: %ERRORLEVEL%^)
     )
@@ -134,6 +137,25 @@ if exist "%VCD_FILE%" (
     goto :eof
 ) else (
     echo Arquivo nao encontrado: %VCD_FILE%
-    echo Execute o teste correspondente antes para gerar o VCD.
+    echo Gerando automaticamente o VCD correspondente...
+    REM Mapear o arquivo solicitado para o teste correto
+    if /I "%~1"=="ula_74181.vcd" (
+        call :compile_and_run "ula_74181" "%RTL_DIR%\ula_74181.sv" "%TB_DIR%\tb_ula_74181.sv"
+    ) else if /I "%~1"=="ula_74181_datasheet.vcd" (
+        call :compile_and_run "ula_74181_datasheet" "%RTL_DIR%\ula_74181.sv" "%TB_DIR%\tb_ula_74181_datasheet.sv"
+    ) else if /I "%~1"=="ula_8_bits.vcd" (
+        call :compile_and_run "ula_8_bits" "%RTL_DIR%\ula_74181.sv" "%RTL_DIR%\ula_8_bits.sv" "%TB_DIR%\tb_ula_8_bits.sv"
+    ) else if /I "%~1"=="ula_8_bits_datasheet.vcd" (
+        call :compile_and_run "ula_8_bits_datasheet" "%RTL_DIR%\ula_74181.sv" "%RTL_DIR%\ula_8_bits.sv" "%TB_DIR%\tb_ula_8_bits_datasheet.sv"
+    ) else (
+        echo Nao foi possivel identificar o teste para %~1
+        goto :eof
+    )
+    if exist "%VCD_FILE%" (
+        echo Abrindo %VCD_FILE% no GTKWave...
+        start "GTKWave" gtkwave "%VCD_FILE%"
+    ) else (
+        echo Falha ao gerar o VCD: %VCD_FILE%
+    )
     goto :eof
 )

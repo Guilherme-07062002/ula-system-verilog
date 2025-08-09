@@ -32,7 +32,8 @@ compile_and_run() {
     local result=$?
     if [ $result -eq 0 ]; then
         echo "=== Executando $name ==="
-        vvp "$SIM_DIR/${name}.vvp"
+        # Executa a simulação a partir de tb/ para que $dumpfile("../sim/...\") gere VCDs em sim/
+        ( cd "$TB_DIR" && vvp "../sim/${name}.vvp" )
     else
         echo "Erro na compilação de $name (código: $result)"
     fi
@@ -106,7 +107,25 @@ open_vcd() {
         fi
     else
         echo "Arquivo não encontrado: $vcd_file"
-        echo "Execute o teste correspondente antes para gerar o VCD."
+        echo "Gerando automaticamente o VCD correspondente..."
+        case "$1" in
+            "ula_74181.vcd")
+                compile_and_run "ula_74181" "$RTL_DIR/ula_74181.sv" "$TB_DIR/tb_ula_74181.sv" ;;
+            "ula_74181_datasheet.vcd")
+                compile_and_run "ula_74181_datasheet" "$RTL_DIR/ula_74181.sv" "$TB_DIR/tb_ula_74181_datasheet.sv" ;;
+            "ula_8_bits.vcd")
+                compile_and_run "ula_8_bits" "$RTL_DIR/ula_74181.sv" "$RTL_DIR/ula_8_bits.sv" "$TB_DIR/tb_ula_8_bits.sv" ;;
+            "ula_8_bits_datasheet.vcd")
+                compile_and_run "ula_8_bits_datasheet" "$RTL_DIR/ula_74181.sv" "$RTL_DIR/ula_8_bits.sv" "$TB_DIR/tb_ula_8_bits_datasheet.sv" ;;
+            *)
+                echo "Não foi possível identificar o teste para $1" ;;
+        esac
+        if [ -f "$vcd_file" ]; then
+            echo "Abrindo $vcd_file no GTKWave..."
+            gtkwave "$vcd_file" &
+        else
+            echo "Falha ao gerar o VCD: $vcd_file"
+        fi
         read -r -p "Pressione ENTER para continuar..."
     fi
 }
