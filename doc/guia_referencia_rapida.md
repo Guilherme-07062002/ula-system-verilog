@@ -10,41 +10,41 @@ Este documento fornece uma referência rápida das operações disponíveis nas 
 |--------|----------|-----------|------------------|
 | 0000 | ~A | NOT A | ~A |
 | 0001 | ~(A \| B) | NOR | ~(A \| B) |
-| 0010 | (~A) & B | B AND (NOT A) | (~A) & B |
+| 0010 | (~A) & B | NOT A AND B | (~A) & B |
 | 0011 | 0 | Zero constante | 0 |
 | 0100 | ~(A & B) | NAND | ~(A & B) |
 | 0101 | ~B | NOT B | ~B |
 | 0110 | A ^ B | XOR | A ^ B |
-| 0111 | A & (~B) | A AND (NOT B) | A & (~B) |
-| 1000 | (~A) \| B | (NOT A) OR B | (~A) \| B |
+| 0111 | A & (~B) | A AND NOT B | A & (~B) |
+| 1000 | A & B | AND | A & B |
 | 1001 | ~(A ^ B) | XNOR | ~(A ^ B) |
-| 1010 | B | B (passagem direta) | B |
-| 1011 | A & B | AND | A & B |
+| 1010 | B | Passa B | B |
+| 1011 | (~A) \| B | NOT A OR B | (~A) \| B |
 | 1100 | 1 | Um constante | 1 |
-| 1101 | A \| (~B) | A OR (NOT B) | A \| (~B) |
+| 1101 | A \| (~B) | A OR NOT B | A \| (~B) |
 | 1110 | A \| B | OR | A \| B |
-| 1111 | A | A (passagem direta) | A |
+| 1111 | A | Passa A | A |
 
 ### Modo Aritmético (M=0)
 
 | S[3:0] | Operação | Descrição | Equivalente em C |
 |--------|----------|-----------|------------------|
-| 0000 | A | A menos 1 | A - 1 |
-| 0001 | A + (A\|B) | A plus (A OR B) | A + (A \| B) |
-| 0010 | (A\|~B) | (A OR NOT B) menos 1 | (A \| ~B) - 1 |
-| 0011 | -1 | Menos 1 (todos 1's) | -1 |
-| 0100 | A + (A&B) | A mais (A AND B) | A + (A & B) |
-| 0101 | (A\|B) + (A&B) | (A OR B) mais (A AND B) | (A \| B) + (A & B) |
-| 0110 | A - B - 1 | A menos B menos 1 | A - B - 1 |
-| 0111 | (A&~B) - 1 | (A AND NOT B) menos 1 | (A & ~B) - 1 |
-| 1000 | A + (A&~B) | A mais (A AND NOT B) | A + (A & ~B) |
+| 0000 | A − 1 | Decremento de A | A - 1 |
+| 0001 | A + (A\|B) | Soma com (A OR B) | A + (A \| B) |
+| 0010 | (A\|B) − 1 | Decremento de (A OR B) | (A \| B) - 1 |
+| 0011 | −1 | Constante −1 (0xF/0xFF) | -1 |
+| 0100 | A + (A&B) | Soma com (A AND B) | A + (A & B) |
+| 0101 | (A\|B) + (A&B) | Soma de (OR) com (AND) | (A \| B) + (A & B) |
+| 0110 | A − B − 1 | Subtração com borrow | A + (~B) + Cin |
+| 0111 | (A&~B) − 1 | Decremento de (A AND ~B) | (A & ~B) - 1 |
+| 1000 | A + (A&~B) | Soma com (A AND ~B) | A + (A & ~B) |
 | 1001 | A + B | Adição | A + B |
-| 1010 | (A\|~B) + (A&B) | (A OR NOT B) mais (A AND B) | (A \| ~B) + (A & B) |
-| 1011 | (A&B) - 1 | (A AND B) menos 1 | (A & B) - 1 |
-| 1100 | A + A | A mais A (dobro) | A + A |
-| 1101 | (A\|B) + A | (A OR B) mais A | (A \| B) + A |
-| 1110 | (A\|~B) + A | (A OR NOT B) mais A | (A \| ~B) + A |
-| 1111 | A - 1 | A menos 1 | A - 1 |
+| 1010 | (A\|~B) + (A&B) | Soma composta | (A \| ~B) + (A & B) |
+| 1011 | (A&B) − 1 | Decremento de (A AND B) | (A & B) - 1 |
+| 1100 | A + A | Dobro de A | A + A |
+| 1101 | (A\|B) + A | Soma de (A OR B) com A | (A \| B) + A |
+| 1110 | (A\|~B) + A | Soma de (A OR ~B) com A | (A \| ~B) + A |
+| 1111 | A | Passagem de A | A |
 
 ## Exemplos de Uso Prático
 

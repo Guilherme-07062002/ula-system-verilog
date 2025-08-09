@@ -35,10 +35,12 @@ C_in --->|                                   |
    - P (Propagate) = P3 & P2 & P1 & P0
    - G (Generate) = G3 + (P3 & G2) + (P3 & P2 & G1) + (P3 & P2 & P1 & G0)
 
-3. **Cálculo do Carry out**:
-   - Depende do modo (M) e dos sinais P, G e Carry in
-   - No modo lógico (M=1): C_out = 1
-   - No modo aritmético (M=0): C_out = G + (P & Cin)
+3. **Cálculo do Carry out (visão da implementação)**:
+    - O módulo 4 bits expõe dois sinais relacionados a carry:
+       - `c_out` (compatível com a convenção do 74181, incluindo complementação em funções específicas do modo aritmético)
+       - `c_ripple` (carry “verdadeiro” da soma aritmética, usado para cascateamento)
+    - No modo lógico (M=1), `c_out` é mantido em 0 (carry irrelevante no modo lógico) e `c_ripple` é 0.
+    - No modo aritmético (M=0), `c_out` segue a convenção do datasheet e `c_ripple` reflete o bit de carry da soma.
 
 ## Arquitetura da ULA 8 bits
 
@@ -56,7 +58,7 @@ C_in ----------->|                |
                  |                |-----> G_LSB
                  +----------------+
                         |
-                        | C_out_LSB
+                        | c_ripple (LSB)
                         v
                  +----------------+
                  |                |
@@ -69,7 +71,7 @@ M -------------->|                |-----> A=B_MSB
                  |                |-----> G_MSB
                  +----------------+
                         |
-                        | C_out_MSB = C_out final
+                        | C_out (MSB) = C_out final
                         v
 ```
 
@@ -77,10 +79,7 @@ M -------------->|                |-----> A=B_MSB
 
 1. **Ripple Carry**: O atraso de propagação do carry é um fator crucial para o desempenho da ULA de 8 bits. Com o método de ripple carry, o carry-out da ULA LSB deve se estabilizar antes que a ULA MSB possa produzir resultados finais corretos. Isso impõe uma limitação de velocidade.
 
-2. **Detecção de Overflow**: Para operações aritméticas em complemento de dois, o overflow é detectado comparando o carry-in com o carry-out do bit mais significativo. É implementado como:
-   ```
-   overflow = c_out_msb ^ carry_entre_ulas (somente para operações aritméticas)
-   ```
+2. **Detecção de Overflow**: Para operações aritméticas em complemento de dois na ULA de 8 bits, a implementação detecta overflow para adição (S=1001) e subtração (S=0110) usando as regras clássicas de sinal (operandos e resultado), e zera no modo lógico. Outras funções não acusam overflow.
 
 3. **Expandindo os Sinais P e G**:
    - P para 8 bits = P_LSB & P_MSB
@@ -93,8 +92,8 @@ M -------------->|                |-----> A=B_MSB
 
 Um aspecto importante a considerar é o tratamento de carry em operações de subtração. No 74181, algumas operações de subtração têm o carry invertido para manter a compatibilidade com o datasheet original:
 
-1. Quando M=0 (modo aritmético) e S[3]=0, o carry-out é invertido para operações de subtração
-2. Para operações de adição (S=1001), o carry-out é o valor real
+1. Em um subconjunto específico de funções do modo aritmético (S ∈ {0000, 0010, 0011, 0110, 0111, 1011}), o carry-out reportado (`c_out`) é o complemento do carry real, conforme a convenção da 74181.
+2. Nas demais funções aritméticas (por exemplo, S=1001 A+B), `c_out` reporta o carry real.
 
 ## Otimizações Possíveis
 

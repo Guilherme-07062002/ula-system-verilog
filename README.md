@@ -26,7 +26,7 @@ Esta é a implementação base da ULA de 4 bits que segue as especificações do
 
 - **Interface**:
   - Entradas: `a[3:0]`, `b[3:0]` (operandos), `s[3:0]` (seleção da operação), `m` (modo lógico/aritmético), `c_in` (carry de entrada)
-  - Saídas: `f[3:0]` (resultado), `a_eq_b` (flag de igualdade), `c_out` (carry de saída), `p` (propagate), `g` (generate)
+  - Saídas: `f[3:0]` (resultado), `a_eq_b` (flag de igualdade), `c_out` (carry de saída), `p` (propagate), `g` (generate), `c_ripple` (carry "verdadeiro" para cascateamento)
 
 - **Funcionalidades**:
   - **Modo Lógico (m=1)**: Implementa 16 operações lógicas diferentes (NOR, NAND, XOR, etc.)
@@ -42,13 +42,16 @@ Esta é a implementação base da ULA de 4 bits que segue as especificações do
 Esta implementação combina duas instâncias da ULA 74181 para criar uma ULA de 8 bits:
 
 - **Arquitetura**: Utiliza duas ULAs de 4 bits, uma para os bits menos significativos (LSB) e outra para os mais significativos (MSB)
-- **Propagação de carry**: Implementa um método de carry look-ahead entre os dois blocos de 4 bits
+- **Propagação de carry**: Implementa ripple carry entre os blocos de 4 bits (c_ripple da ULA LSB alimenta o c_in da ULA MSB). Os sinais P/G são calculados e expostos para depuração/integração, mas não são usados para carry look-ahead nesta versão
 - **Funcionalidades adicionais**:
   - Detecção de overflow para aritmética em complemento a dois
   - Suporte a operações de 8 bits completas
-  - Sinais de carry look-ahead para integração em sistemas maiores
+  - Sinais P/G agregados de 8 bits (úteis para integração futura com carry look-ahead)
 
-- **Limitações identificadas**: Esta implementação apresenta problemas com algumas operações aritméticas específicas, principalmente aquelas que envolvem carry/borrow entre os nibbles (conjuntos de 4 bits). As simulações detalhadas mostram que algumas operações, especialmente aquelas que envolvem carry/borrow entre os nibbles, podem apresentar resultados inconsistentes.
+## Estado atual da implementação
+
+- A ULA 74181 (4 bits) implementa corretamente as 16 operações lógicas e 16 aritméticas do datasheet; c_out segue a convenção da 74181 (carry complementado para um subconjunto de funções no modo aritmético). P/G e a_eq_b operam conforme esperado.
+- A ULA de 8 bits (ripple carry) foi validada com varredura completa (m, s, c_in) e vetores representativos; os testbenches atuais reportam 100% de aprovação após recompilação.
 
 ## Testbenches e Simulação
 
@@ -85,9 +88,7 @@ A pasta `sim/` contém os arquivos gerados durante a simulação:
 - O carry de saída (`c_out`) é manipulado adequadamente para todas as operações
 
 ### ULA de 8 bits
-- Funciona corretamente para muitas operações básicas
-- Apresenta problemas com certas operações aritméticas, especialmente aquelas que envolvem carry/borrow entre os nibbles
-- Os problemas mais comuns ocorrem em operações de subtração e decremento
+- Validada com varredura de modos (m), funções (s) e c_in, além de casos dirigidos (carry entre nibbles e overflow); os testbenches atuais reportam todos os casos aprovados após recompilação
 
 
 ## Como Executar as Simulações
@@ -112,21 +113,7 @@ chmod +x build.sh  # Se necessário
 
 ## Análise e Conclusões
 
-### Limitações da ULA de 8 bits
-
-A ULA de 8 bits é construída cascateando duas ULAs de 4 bits (74181) usando a técnica de **ripple carry**. Isso significa que o carry out da ULA menos significativa (LSB) alimenta o carry in da ULA mais significativa (MSB). Esta arquitetura apresenta limitações em operações específicas, resultando em comportamentos inconsistentes quando comparados às especificações do datasheet.
-
-Os testes mostram que a implementação atual tem dificuldades em:
-1. Operações de decremento com borrow entre nibbles
-2. Operações como `(A OR B) MINUS 1` em certos valores específicos
-3. Operações de subtração com carry propagado entre os nibbles
-
-### Operações Problemáticas
-
-As operações mais problemáticas são:
-- Operações com código S=0010 (`(A OR B) MINUS 1`)
-- Operações com código S=0011 (`MINUS 1` ou operações semelhantes)
-- Operações com código S=0101, S=1010, S=1011 e S=1111 em certos valores específicos
+A arquitetura de 8 bits usa ripple carry entre nibbles. Apesar de os sinais P/G de 8 bits serem expostos para depuração/integração futura, o caminho de carry atual é por ripple. As simulações (Icarus Verilog) confirmam compatibilidade funcional com o datasheet para 4 bits e a composição correta para 8 bits nas baterias de testes incluídas.
 
 ## Documentação Adicional
 

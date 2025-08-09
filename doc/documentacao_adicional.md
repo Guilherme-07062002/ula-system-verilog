@@ -110,27 +110,14 @@ O projeto inclui múltiplos testbenches, cada um com um propósito específico p
   - Resultou em 100% de compatibilidade (todos os testes passaram)
 
 - **tb_ula_8_bits_datasheet.sv**: Testbench de validação da ULA de 8 bits
-  - Estende a metodologia do testbench anterior para 8 bits
-  - Testa todas as 32 operações com operandos de 8 bits
-  - Verifica o comportamento do ripple carry e overflow
-  - Apresenta algumas discrepâncias devido à complexidade do comportamento em cascata
-
-- **tb_ula_8_bits_final.sv**: Testbench definitivo para a ULA de 8 bits
-  - Utiliza uma abordagem de comparação direta com ULAs de referência
-  - Instancia ULAs de 4 bits separadamente como modelo de referência
-  - Valida precisamente a implementação cascateada
-  - Testes específicos para ripple carry e overflow
-  - Obtém 100% de compatibilidade (todos os 394 testes passam)
+  - Estende a metodologia do testbench de 4 bits para 8 bits
+  - Testa todas as 32 operações com operandos de 8 bits e c_in ∈ {0,1}
+  - Verifica o comportamento do ripple carry (c_intermediate) e overflow
+  - Relata 100% de aprovação nas simulações atuais após recompilação
 
 ### 3. Testbench Prático
 
-- **tb_ula_8_bits_simples.sv**: Testbench focado em casos de uso práticos
-  - Em vez de testar exaustivamente todas as operações, foca em casos importantes
-  - Inclui exemplos claros de adição, subtração e operações lógicas
-  - Testa especificamente casos de overflow e carry
-  - Verifica o comportamento dos sinais P e G para 8 bits
-  - Fornece uma saída mais legível para entender o comportamento da ULA
-  - Ideal para demonstração e análise rápida
+> Observação: os nomes de testbenches presentes no repositório são: `tb_ula_74181.sv`, `tb_ula_74181_datasheet.sv`, `tb_ula_8_bits.sv` e `tb_ula_8_bits_datasheet.sv`.
 
 ## Verificação de Compatibilidade
 
@@ -138,7 +125,7 @@ Os testbenches confirmam que ambas as implementações estão em perfeita confor
 
 1. **Para a ULA de 4 bits**: O testbench tb_ula_74181_datasheet.sv confirma 100% de compatibilidade com o datasheet do SN74LS181, com todos os 384 casos de teste passando com sucesso.
 
-2. **Para a ULA de 8 bits**: O testbench tb_ula_8_bits_final.sv valida a implementação cascateada, demonstrando que todos os 394 casos de teste (incluindo testes específicos para ripple carry e overflow) passam com sucesso, comprovando que a ULA de 8 bits se comporta exatamente como esperado.
+2. **Para a ULA de 8 bits**: O testbench `tb_ula_8_bits_datasheet.sv` valida a implementação cascateada, verificando todas as 32 funções em 8 bits (com `c_in` nas duas polaridades) e casos dirigidos; nas simulações atuais, os testes passam após recompilação.
 
 ## Como Executar os Testes
 
