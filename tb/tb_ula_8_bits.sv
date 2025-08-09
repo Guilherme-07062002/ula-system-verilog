@@ -198,9 +198,13 @@ module tb_ula_8_bits;
         $display("| %04b | %02h | %02h |  %b  | %02h |  %b   |   %b   |    %b     |  %b  | A-B-1         | %s  |", 
                 s, a, b, c_in, f, c_out, c_intermediate, overflow, a_eq_b, 
                 (f == 8'hFD) ? "PASS" : "FAIL");
+
+        // Resultado final simples
+        $display("\n=== RESUMO: testes finalizados (verifique PASS/FAIL nas linhas acima) ===");
         
         $display("\n=== Simulacao Concluida ===");
         #100;
+        $display("\n=== FIM DA SIMULACAO: Todos os testes foram executados! ===");
         $finish;
     end
 
