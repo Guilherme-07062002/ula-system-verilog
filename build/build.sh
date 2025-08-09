@@ -55,9 +55,8 @@ show_main_menu() {
 show_submenu() {
     local ula_name=$1
     echo "===== TESTES PARA $ula_name ====="
-    echo "1. Teste Simples"
-    echo "2. Teste Datasheet (completo)"
-    echo "3. Voltar"
+    echo "1. Executar Testbench Completo"
+    echo "2. Voltar"
     echo "============================="
     echo "Escolha uma opção: "
 }
@@ -68,9 +67,6 @@ run_ula_4bits() {
     case $option in
         1) # Teste Simples
             compile_and_run "ula_74181" "$RTL_DIR/ula_74181.sv" "$TB_DIR/tb_ula_74181.sv"
-            ;;
-        2) # Teste Datasheet
-            compile_and_run "ula_74181_datasheet" "$RTL_DIR/ula_74181.sv" "$TB_DIR/tb_ula_74181_datasheet.sv"
             ;;
         *) 
             echo "Opção inválida!"
@@ -84,9 +80,6 @@ run_ula_8bits() {
     case $option in
         1) # Teste Simples
             compile_and_run "ula_8_bits" "$RTL_DIR/ula_74181.sv" "$RTL_DIR/ula_8_bits.sv" "$TB_DIR/tb_ula_8_bits.sv"
-            ;;
-        2) # Teste Datasheet
-            compile_and_run "ula_8_bits_datasheet" "$RTL_DIR/ula_74181.sv" "$RTL_DIR/ula_8_bits.sv" "$TB_DIR/tb_ula_8_bits_datasheet.sv"
             ;;
         *) 
             echo "Opção inválida!"
@@ -108,15 +101,11 @@ open_vcd() {
     else
         echo "Arquivo não encontrado: $vcd_file"
         echo "Gerando automaticamente o VCD correspondente..."
-        case "$1" in
+        case $1 in
             "ula_74181.vcd")
                 compile_and_run "ula_74181" "$RTL_DIR/ula_74181.sv" "$TB_DIR/tb_ula_74181.sv" ;;
-            "ula_74181_datasheet.vcd")
-                compile_and_run "ula_74181_datasheet" "$RTL_DIR/ula_74181.sv" "$TB_DIR/tb_ula_74181_datasheet.sv" ;;
             "ula_8_bits.vcd")
                 compile_and_run "ula_8_bits" "$RTL_DIR/ula_74181.sv" "$RTL_DIR/ula_8_bits.sv" "$TB_DIR/tb_ula_8_bits.sv" ;;
-            "ula_8_bits_datasheet.vcd")
-                compile_and_run "ula_8_bits_datasheet" "$RTL_DIR/ula_74181.sv" "$RTL_DIR/ula_8_bits.sv" "$TB_DIR/tb_ula_8_bits_datasheet.sv" ;;
             *)
                 echo "Não foi possível identificar o teste para $1" ;;
         esac
@@ -136,19 +125,15 @@ show_gtkwave_menu() {
         clear
         echo "===== VISUALIZAR ONDAS (GTKWave) ====="
         echo "1. 74181 (ula_74181.vcd)"
-        echo "2. 74181 - Datasheet (ula_74181_datasheet.vcd)"
-        echo "3. ULA 8 bits (ula_8_bits.vcd)"
-        echo "4. ULA 8 bits - Datasheet (ula_8_bits_datasheet.vcd)"
-        echo "5. Voltar"
+        echo "2. ULA 8 bits (ula_8_bits.vcd)"
+        echo "3. Voltar"
         echo "======================================"
         echo -n "Escolha uma opção: "
         read -r opt
         case $opt in
             1) open_vcd "ula_74181.vcd" ;;
-            2) open_vcd "ula_74181_datasheet.vcd" ;;
-            3) open_vcd "ula_8_bits.vcd" ;;
-            4) open_vcd "ula_8_bits_datasheet.vcd" ;;
-            5) break ;;
+            2) open_vcd "ula_8_bits.vcd" ;;
+            3) break ;;
             *) echo "Opção inválida!"; read -r -p "Pressione ENTER para continuar..." ;;
         esac
     done
@@ -159,49 +144,33 @@ while true; do
     clear
     show_main_menu
     read -r main_option
-    
     case $main_option in
-        1) # ULA de 4 bits
+        1)
             while true; do
                 show_submenu "ULA DE 4 BITS (74181)"
                 read -r sub_option
-                
-                if [ "$sub_option" == "3" ]; then
-                    break
-                fi
-                
+                if [ "$sub_option" == "2" ]; then break; fi
                 run_ula_4bits "$sub_option"
-                echo "Pressione ENTER para continuar..."
-                read -r
+                echo "Pressione ENTER para continuar..."; read -r
             done
             ;;
-            
-        2) # ULA de 8 bits
+        2)
             while true; do
                 show_submenu "ULA DE 8 BITS"
                 read -r sub_option
-                
-                if [ "$sub_option" == "3" ]; then
-                    break
-                fi
-                
+                if [ "$sub_option" == "2" ]; then break; fi
                 run_ula_8bits "$sub_option"
-                echo "Pressione ENTER para continuar..."
-                read -r
+                echo "Pressione ENTER para continuar..."; read -r
             done
             ;;
-        3) # Visualizar ondas (GTKWave)
+        3)
             show_gtkwave_menu
             ;;
-
-        4) # Sair
-            echo "Saindo do programa..."
-            exit 0
+        4)
+            echo "Saindo do programa..."; exit 0
             ;;
-            
         *)
-            echo "Opção inválida! Pressione ENTER para continuar..."
-            read -r
+            echo "Opção inválida! Pressione ENTER para continuar..."; read -r
             ;;
     esac
 done

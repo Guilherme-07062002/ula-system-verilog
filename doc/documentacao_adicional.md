@@ -83,49 +83,18 @@ A ULA de 8 bits é implementada conectando duas ULAs 74181 com ripple carry. Ess
 
 ## Arquivos de Teste (Testbenches)
 
-O projeto inclui múltiplos testbenches, cada um com um propósito específico para testar diferentes aspectos da implementação:
+Há um único testbench consolidado por ULA, que cobre todas as operações, ambas as polaridades de `c_in` e casos dirigidos:
 
-### 1. Testbenches Básicos Iniciais
-
-- **tb_ula_74181.sv**: Testbench básico para a ULA de 4 bits
-  - Testa as operações fundamentais da ULA de 4 bits
-  - Verifica se a ULA produz saídas corretas para entradas específicas
-  - Útil para validação inicial durante o desenvolvimento
-
-- **tb_ula_8_bits.sv**: Testbench básico para a ULA de 8 bits
-  - Verifica operações básicas com operandos de 8 bits
-  - Testa o ripple carry entre as duas ULAs de 4 bits
-  - Inclui alguns testes para detecção de overflow
-  - Valida a interconexão dos módulos de 4 bits
-
-### 2. Testbenches de Compatibilidade com o Datasheet
-
-- **tb_ula_74181_datasheet.sv**: Testbench rigoroso para a ULA de 4 bits
-  - Testa **todas** as 32 operações possíveis (16 lógicas + 16 aritméticas)
-  - Verifica cada operação com múltiplos valores de entrada
-  - Testa com c_in = 0 e c_in = 1 para cada caso
-  - Verifica precisamente o comportamento dos sinais P, G e carry-out
-  - Compara os resultados com valores esperados calculados conforme o datasheet
-  - Executa um total de 384 casos de teste diferentes
-  - Resultou em 100% de compatibilidade (todos os testes passaram)
-
-- **tb_ula_8_bits_datasheet.sv**: Testbench de validação da ULA de 8 bits
-  - Estende a metodologia do testbench de 4 bits para 8 bits
-  - Testa todas as 32 operações com operandos de 8 bits e c_in ∈ {0,1}
-  - Verifica o comportamento do ripple carry (c_intermediate) e overflow
-  - Relata 100% de aprovação nas simulações atuais após recompilação
-
-### 3. Testbench Prático
-
-> Observação: os nomes de testbenches presentes no repositório são: `tb_ula_74181.sv`, `tb_ula_74181_datasheet.sv`, `tb_ula_8_bits.sv` e `tb_ula_8_bits_datasheet.sv`.
+- **tb_ula_74181.sv**: Testbench completo para a ULA de 4 bits (74181), incluindo verificação de P/G e regras de carry do datasheet.
+- **tb_ula_8_bits.sv**: Testbench completo para a ULA de 8 bits, incluindo verificação de ripple carry, `a_eq_b` e overflow.
 
 ## Verificação de Compatibilidade
 
 Os testbenches confirmam que ambas as implementações estão em perfeita conformidade com o comportamento esperado:
 
-1. **Para a ULA de 4 bits**: O testbench tb_ula_74181_datasheet.sv confirma 100% de compatibilidade com o datasheet do SN74LS181, com todos os 384 casos de teste passando com sucesso.
+1. **Para a ULA de 4 bits**: O testbench `tb_ula_74181.sv` (consolidado) confirma 100% de compatibilidade com o datasheet do SN74LS181 nos testes executados em simulação.
 
-2. **Para a ULA de 8 bits**: O testbench `tb_ula_8_bits_datasheet.sv` valida a implementação cascateada, verificando todas as 32 funções em 8 bits (com `c_in` nas duas polaridades) e casos dirigidos; nas simulações atuais, os testes passam após recompilação.
+2. **Para a ULA de 8 bits**: O testbench `tb_ula_8_bits.sv` valida a implementação cascateada, verificando todas as 32 funções em 8 bits (com `c_in` nas duas polaridades) e casos dirigidos; nas simulações atuais, os testes passam após recompilação.
 
 ## Como Executar os Testes
 
@@ -145,11 +114,11 @@ vvp sim/NOME_TESTBENCH.vvp
 gtkwave sim/NOME_TESTBENCH.vcd
 ```
 
-Por exemplo, para executar o testbench mais completo da ULA de 4 bits:
+Por exemplo, para executar o testbench da ULA de 4 bits:
 
 ```bash
-iverilog -g2012 -o sim/ula_74181_datasheet.vvp rtl/ula_74181.sv tb/tb_ula_74181_datasheet.sv
-vvp sim/ula_74181_datasheet.vvp
+iverilog -g2012 -o sim/ula_74181.vvp rtl/ula_74181.sv tb/tb_ula_74181.sv
+vvp sim/ula_74181.vvp
 ```
 
 Os resultados dos testes serão exibidos no terminal e os arquivos .vcd serão gerados para análise com GTKWave, se necessário.

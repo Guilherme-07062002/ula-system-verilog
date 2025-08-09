@@ -51,9 +51,8 @@ goto main_menu
 :menu_ula_4bits
 cls
 echo ===== TESTES PARA ULA DE 4 BITS (74181) =====
-echo 1. Teste Simples
-echo 2. Teste Datasheet (completo)
-echo 3. Voltar
+echo 1. Executar Testbench Completo
+echo 2. Voltar
 echo =========================================
 set /p sub_option=Escolha uma opcao: 
 
@@ -62,12 +61,7 @@ if "%sub_option%"=="1" (
     pause
     goto menu_ula_4bits
 )
-if "%sub_option%"=="2" (
-    call :compile_and_run "ula_74181_datasheet" "%RTL_DIR%\ula_74181.sv" "%TB_DIR%\tb_ula_74181_datasheet.sv"
-    pause
-    goto menu_ula_4bits
-)
-if "%sub_option%"=="3" goto main_menu
+if "%sub_option%"=="2" goto main_menu
 echo Opcao invalida! Pressione qualquer tecla para continuar...
 pause > nul
 goto menu_ula_4bits
@@ -75,9 +69,8 @@ goto menu_ula_4bits
 :menu_ula_8bits
 cls
 echo ===== TESTES PARA ULA DE 8 BITS =====
-echo 1. Teste Simples
-echo 2. Teste Datasheet (completo)
-echo 3. Voltar
+echo 1. Executar Testbench Completo
+echo 2. Voltar
 echo =================================
 set /p sub_option=Escolha uma opcao: 
 
@@ -86,12 +79,7 @@ if "%sub_option%"=="1" (
     pause
     goto menu_ula_8bits
 )
-if "%sub_option%"=="2" (
-    call :compile_and_run "ula_8_bits_datasheet" "%RTL_DIR%\ula_74181.sv" "%RTL_DIR%\ula_8_bits.sv" "%TB_DIR%\tb_ula_8_bits_datasheet.sv"
-    pause
-    goto menu_ula_8bits
-)
-if "%sub_option%"=="3" goto main_menu
+if "%sub_option%"=="2" goto main_menu
 echo Opcao invalida! Pressione qualquer tecla para continuar...
 pause > nul
 goto menu_ula_8bits
@@ -107,18 +95,14 @@ goto main_menu
 cls
 echo ===== VISUALIZAR ONDAS ^(GTKWave^) =====
 echo 1. 74181 ^(ula_74181.vcd^)
-echo 2. 74181 - Datasheet ^(ula_74181_datasheet.vcd^)
-echo 3. ULA 8 bits ^(ula_8_bits.vcd^)
-echo 4. ULA 8 bits - Datasheet ^(ula_8_bits_datasheet.vcd^)
-echo 5. Voltar
+echo 2. ULA 8 bits ^(ula_8_bits.vcd^)
+echo 3. Voltar
 echo ======================================
 set /p gw_option=Escolha uma opcao: 
 
 if "%gw_option%"=="1" call :open_vcd "ula_74181.vcd" & pause & goto menu_gtkwave
-if "%gw_option%"=="2" call :open_vcd "ula_74181_datasheet.vcd" & pause & goto menu_gtkwave
-if "%gw_option%"=="3" call :open_vcd "ula_8_bits.vcd" & pause & goto menu_gtkwave
-if "%gw_option%"=="4" call :open_vcd "ula_8_bits_datasheet.vcd" & pause & goto menu_gtkwave
-if "%gw_option%"=="5" goto main_menu
+if "%gw_option%"=="2" call :open_vcd "ula_8_bits.vcd" & pause & goto menu_gtkwave
+if "%gw_option%"=="3" goto main_menu
 echo Opcao invalida! Pressione qualquer tecla para continuar...
 pause > nul
 goto menu_gtkwave
@@ -141,12 +125,8 @@ if exist "%VCD_FILE%" (
     REM Mapear o arquivo solicitado para o teste correto
     if /I "%~1"=="ula_74181.vcd" (
         call :compile_and_run "ula_74181" "%RTL_DIR%\ula_74181.sv" "%TB_DIR%\tb_ula_74181.sv"
-    ) else if /I "%~1"=="ula_74181_datasheet.vcd" (
-        call :compile_and_run "ula_74181_datasheet" "%RTL_DIR%\ula_74181.sv" "%TB_DIR%\tb_ula_74181_datasheet.sv"
     ) else if /I "%~1"=="ula_8_bits.vcd" (
         call :compile_and_run "ula_8_bits" "%RTL_DIR%\ula_74181.sv" "%RTL_DIR%\ula_8_bits.sv" "%TB_DIR%\tb_ula_8_bits.sv"
-    ) else if /I "%~1"=="ula_8_bits_datasheet.vcd" (
-        call :compile_and_run "ula_8_bits_datasheet" "%RTL_DIR%\ula_74181.sv" "%RTL_DIR%\ula_8_bits.sv" "%TB_DIR%\tb_ula_8_bits_datasheet.sv"
     ) else (
         echo Nao foi possivel identificar o teste para %~1
         goto :eof

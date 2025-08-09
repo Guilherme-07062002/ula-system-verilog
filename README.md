@@ -57,15 +57,10 @@ Esta implementação combina duas instâncias da ULA 74181 para criar uma ULA de
 
 ### Testbenches Implementados
 
-#### ULA 74181 (4 bits)
-- **`tb/tb_ula_74181.sv`**: Testbench básico para a ULA 74181 que verifica o funcionamento correto de todas as operações lógicas e aritméticas com diferentes valores de entrada. Este testbench é ideal para uma verificação rápida da implementação base.
+Há um único testbench “completo” para cada ULA, cobrindo todas as 32 funções (16 lógicas + 16 aritméticas), ambas as polaridades de `c_in` e casos dirigidos:
 
-- **`tb/tb_ula_74181_datasheet.sv`**: Testbench completo e detalhado que valida todas as 32 funções da ULA 74181 contra as especificações do datasheet original. Verifica todas as combinações possíveis de operandos, carry de entrada e sinais de controle.
-
-#### ULA de 8 bits
-- **`tb/tb_ula_8_bits.sv`**: Testbench básico para a ULA de 8 bits que verifica a funcionalidade básica e a integração correta dos dois módulos de 4 bits.
-
-- **`tb/tb_ula_8_bits_datasheet.sv`**: Testbench mais abrangente para a ULA de 8 bits que testa todas as operações seguindo as especificações do datasheet, mas adaptadas para o contexto de 8 bits.
+- **`tb/tb_ula_74181.sv`**: Testbench consolidado e completo para a ULA 74181 (4 bits).
+- **`tb/tb_ula_8_bits.sv`**: Testbench consolidado e completo para a ULA de 8 bits (com verificação de ripple carry e overflow).
 
 ### Arquivos de Simulação (pasta sim/)
 
@@ -73,9 +68,7 @@ A pasta `sim/` contém os arquivos gerados durante a simulação:
 
 - **Arquivos VCD**: Arquivos de Change Dump que registram as alterações nos sinais durante a simulação. Estes podem ser visualizados usando ferramentas como GTKWave para análise detalhada das formas de onda.
   - `ula_74181.vcd`: Resultados da simulação da ULA de 4 bits
-  - `ula_74181_datasheet.vcd`: Resultados da simulação da ULA de 4 bits (testbench datasheet)
-  - `ula_8_bits.vcd`: Resultados da simulação da ULA de 8 bits básica
-  - `ula_8_bits_datasheet.vcd`: Resultados da simulação da ULA de 8 bits (testbench datasheet)
+  - `ula_8_bits.vcd`: Resultados da simulação da ULA de 8 bits
 
 - **Arquivos VVP**: Arquivos executáveis compilados pelo Icarus Verilog, prontos para serem executados para realizar a simulação.
 
