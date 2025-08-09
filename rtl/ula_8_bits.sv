@@ -34,7 +34,8 @@ module ula_8_bits (
         .c_in(c_in),
         .f(f_lsb),
         .a_eq_b(a_eq_b_lsb),
-        .c_out(c_intermediate), // Renomeado para melhor clareza
+        .c_out(),    // c_out (datasheet) não usado para ripple
+        .c_ripple(c_intermediate), // carry verdadeiro entre ULAs
         .p(p_lsb),
         .g(g_lsb)
     );
@@ -48,10 +49,11 @@ module ula_8_bits (
         .b(b[7:4]),
         .s(s),
         .m(m),
-        .c_in(c_intermediate), // Conexão do ripple carry
+        .c_in(c_intermediate), // ripple carry verdadeiro
         .f(f_msb),
         .a_eq_b(a_eq_b_msb),
         .c_out(c_out),    // O carry_out do MSB é o carry_out final
+        .c_ripple(),
         .p(p_msb),
         .g(g_msb)
     );

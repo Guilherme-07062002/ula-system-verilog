@@ -8,6 +8,7 @@ module ula_74181 (
     output reg  [3:0] f,
     output wire       a_eq_b,
     output reg        c_out,  // Carry-out ≡ Cn+4
+    output reg        c_ripple, // Carry-out verdadeiro (para ripple carry de 8 bits)
     output wire       p,      // Propagate (para carry look-ahead)
     output wire       g       // Generate (para carry look-ahead)
 );
@@ -79,7 +80,7 @@ module ula_74181 (
 
     // Funções lógicas e aritméticas
     always @* begin
-        if (m) begin
+    if (m) begin
             // Modo lógico (m = 1) - `c_out` é sempre 0
             case (s)
                 4'b0000: f = ~a;         // F = not(A)
@@ -99,7 +100,8 @@ module ula_74181 (
                 4'b1110: f = a | b;      // F = OR
                 4'b1111: f = a;          // F = A
             endcase
-            c_out = 1'b0;
+            c_out    = 1'b0;
+            c_ripple = 1'b0;
         end else begin
             // Modo aritmético (m = 0) - Operações conforme datasheet SN74LS181
             case (s)
@@ -154,9 +156,24 @@ module ula_74181 (
             endcase
 
             f = sum_arith[3:0];
-            // Para ripple correto entre ULAs de 4 bits, exponha SEMPRE o carry verdadeiro.
-            // c_out=1 indica carry (sem borrow) e c_out=0 indica borrow a ser propagado.
-            c_out = sum_arith[4];
+            // Carry-out conforme convenção da 74181:
+            // Em algumas funções aritméticas (relacionadas a decremento/subtração), o Cn+4
+            // é apresentado de forma complementada em relação ao carry da soma interna.
+            // S = {0000, 0010, 0011, 0110, 0111, 1011} -> carry complementado.
+            // Demais funções -> carry direto.
+            unique case (s)
+                4'b0000, // A - 1
+                4'b0010, // (A | B) - 1
+                4'b0011, // -1
+                4'b0110, // A - B - 1 (A + ~B + Cin)
+                4'b0111, // (A & ~B) - 1
+                4'b1011: // (A & B) - 1
+                    c_out = ~sum_arith[4];
+                default:
+                    c_out = sum_arith[4];
+            endcase
+            // Carry verdadeiro para ripple entre ULAs (sempre carry direto da soma aritmética)
+            c_ripple = sum_arith[4];
         end
     end
 endmodule

@@ -81,7 +81,22 @@ module tb_ula_8_bits;
                 input [8:0] res9;
                 input       m_local;
                 begin
-                        ref_cout = (m_local == 1'b0) ? res9[8] : 1'b0;
+                        if (m_local == 1'b1) begin
+                                ref_cout = 1'b0; // modo lógico
+                        end else begin
+                                // Regra da 74181: para operações de decremento/subtração o carry é complementado
+                                case (s_local)
+                                        4'b0000, // A - 1
+                                        4'b0010, // (A | B) - 1
+                                        4'b0011, // -1
+                                        4'b0110, // A - B - 1
+                                        4'b0111, // (A & ~B) - 1
+                                        4'b1011: // (A & B) - 1
+                                                ref_cout = ~res9[8];
+                                        default:
+                                                ref_cout = res9[8];
+                                endcase
+                        end
                 end
         endfunction
 
