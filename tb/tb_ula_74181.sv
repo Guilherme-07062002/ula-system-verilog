@@ -35,20 +35,20 @@ module tb_ula_74181;
         begin
             case(s)
                 4'b0000: calculate_expected_f_logic = ~a;
-                4'b0001: calculate_expected_f_logic = ~(a | b);
-                4'b0010: calculate_expected_f_logic = (~a) & b;
-                4'b0011: calculate_expected_f_logic = 4'b0000;
-                4'b0100: calculate_expected_f_logic = ~(a & b);
+                4'b0001: calculate_expected_f_logic = ~(a & b);
+                4'b0010: calculate_expected_f_logic = (~a) | b;
+                4'b0011: calculate_expected_f_logic = 4'b1111;
+                4'b0100: calculate_expected_f_logic = ~(a | b);
                 4'b0101: calculate_expected_f_logic = ~b;
-                4'b0110: calculate_expected_f_logic = a ^ b;
-                4'b0111: calculate_expected_f_logic = a & (~b);
-                4'b1000: calculate_expected_f_logic = a & b;
-                4'b1001: calculate_expected_f_logic = ~(a ^ b);
+                4'b0110: calculate_expected_f_logic = ~(a ^ b);
+                4'b0111: calculate_expected_f_logic = a | (~b);
+                4'b1000: calculate_expected_f_logic = (~a) & b;
+                4'b1001: calculate_expected_f_logic = a ^ b;
                 4'b1010: calculate_expected_f_logic = b;
-                4'b1011: calculate_expected_f_logic = (~a) | b;
-                4'b1100: calculate_expected_f_logic = 4'b1111;
+                4'b1011: calculate_expected_f_logic = a | b;
+                4'b1100: calculate_expected_f_logic = 4'b0000;
                 4'b1101: calculate_expected_f_logic = a | (~b);
-                4'b1110: calculate_expected_f_logic = a | b;
+                4'b1110: calculate_expected_f_logic = a & b;
                 4'b1111: calculate_expected_f_logic = a;
                 default: calculate_expected_f_logic = 4'bxxxx;
             endcase
@@ -61,22 +61,22 @@ module tb_ula_74181;
         reg [4:0] temp;
         begin
             case(s)
-                4'b0000: temp = {1'b0, a} + 5'b01111 + c_in;           // A MINUS 1
-                4'b0001: temp = {1'b0, a} + {1'b0, a|b} + c_in;        // A PLUS (A OR B)
-                4'b0010: temp = {1'b0, a|b} + 5'b01111 + c_in;         // (A OR B) MINUS 1
-                4'b0011: temp = 5'b01111 + c_in;                       // MINUS 1
-                4'b0100: temp = {1'b0, a} + {1'b0, a&b} + c_in;        // A PLUS (A AND B)
-                4'b0101: temp = {1'b0, a|b} + {1'b0, a&b} + c_in;      // (A OR B) PLUS (A AND B)
-                4'b0110: temp = {1'b0, a} + {1'b0, ~b} + c_in;         // A MINUS B MINUS 1
-                4'b0111: temp = {1'b0, a&~b} + 5'b01111 + c_in;        // (A AND ~B) MINUS 1
-                4'b1000: temp = {1'b0, a} + {1'b0, a&~b} + c_in;       // A PLUS (A AND ~B)
-                4'b1001: temp = {1'b0, a} + {1'b0, b} + c_in;          // A PLUS B
-                4'b1010: temp = {1'b0, a|~b} + {1'b0, a&b} + c_in;     // (A OR ~B) PLUS (A AND B)
-                4'b1011: temp = {1'b0, a&b} + 5'b01111 + c_in;         // (A AND B) MINUS 1
-                4'b1100: temp = {1'b0, a} + {1'b0, a} + c_in;          // A PLUS A
-                4'b1101: temp = {1'b0, a|b} + {1'b0, a} + c_in;        // (A OR B) PLUS A
-                4'b1110: temp = {1'b0, a|~b} + {1'b0, a} + c_in;       // (A OR ~B) PLUS A
-                4'b1111: temp = {1'b0, a} + {1'b0, 4'b0000} + c_in;    // A
+                4'b0000: temp = {1'b0, a} + 5'b0_1111 + c_in;                         // A - 1 / A
+                4'b0001: temp = {1'b0, (a & b)} + 5'b0_1111 + c_in;                   // (A&B) - 1 / (A&B)
+                4'b0010: temp = {1'b0, (a & ~b)} + 5'b0_1111 + c_in;                  // (A&~B) - 1 / (A&~B)
+                4'b0011: temp = 5'b0_1111 + c_in;                                     // -1 / 0
+                4'b0100: temp = {1'b0, a} + {1'b0, a} + {1'b0, ~b} + c_in;            // A + (A + ~B) [+1]
+                4'b0101: temp = {1'b0, (a & b)} + {1'b0, a} + {1'b0, ~b} + c_in;      // (A&B) + (A + ~B) [+1]
+                4'b0110: temp = {1'b0, a} + {1'b0, ~b} + c_in;                         // A - B - 1 / A - B
+                4'b0111: temp = {1'b0, a} + {1'b0, ~b} + c_in;                         // A + ~B [+1]
+                4'b1000: temp = {1'b0, a} + {1'b0, a} + {1'b0, b} + c_in;              // A + (A + B) [+1]
+                4'b1001: temp = {1'b0, a} + {1'b0, b} + c_in;                          // A + B [+1]
+                4'b1010: temp = {1'b0, (a & ~b)} + {1'b0, a} + {1'b0, b} + c_in;       // (A&~B) + (A + B) [+1]
+                4'b1011: temp = {1'b0, a} + {1'b0, b} + c_in;                          // A + B [+1]
+                4'b1100: temp = {1'b0, a} + {1'b0, a} + c_in;                          // A + A [+1]
+                4'b1101: temp = {1'b0, (a & b)} + {1'b0, a} + c_in;                    // (A&B) + A [+1]
+                4'b1110: temp = {1'b0, (a & ~b)} + {1'b0, a} + c_in;                   // (A&~B) + A [+1]
+                4'b1111: temp = {1'b0, a} + 5'b0_0000 + c_in;                          // A [+1]
                 default: temp = 5'bxxxxx;
             endcase
             calculate_expected_f_arith = temp;
@@ -102,38 +102,26 @@ module tb_ula_74181;
     endfunction
 
     function calculate_expected_p;
-        input [3:0] a, op_result;
+        input [3:0] s, a, b;
         input m;
-        reg [3:0] p_bits;
+        reg [4:0] r0, r1;
         begin
-            if (m == 1'b1) begin
-                calculate_expected_p = 1'b0;
-            end else begin
-                p_bits[0] = a[0] | op_result[0];
-                p_bits[1] = a[1] | op_result[1];
-                p_bits[2] = a[2] | op_result[2];
-                p_bits[3] = a[3] | op_result[3];
-                calculate_expected_p = &p_bits;
+            if (m == 1'b1) calculate_expected_p = 1'b0; else begin
+                r0 = calculate_expected_f_arith(s, a, b, 1'b0);
+                r1 = calculate_expected_f_arith(s, a, b, 1'b1);
+                calculate_expected_p = r1[4] & ~r0[4];
             end
         end
     endfunction
 
     function calculate_expected_g;
-        input [3:0] a, op_result;
+        input [3:0] s, a, b;
         input m;
-        reg [3:0] p_bits, g_bits;
+        reg [4:0] r0;
         begin
-            if (m == 1'b1) begin
-                calculate_expected_g = 1'b1;
-            end else begin
-                for (int i = 0; i < 4; i = i + 1) begin
-                    p_bits[i] = a[i] | op_result[i];
-                    g_bits[i] = a[i] & op_result[i];
-                end
-                calculate_expected_g = g_bits[3] |
-                                      (p_bits[3] & g_bits[2]) |
-                                      (p_bits[3] & p_bits[2] & g_bits[1]) |
-                                      (p_bits[3] & p_bits[2] & p_bits[1] & g_bits[0]);
+            if (m == 1'b1) calculate_expected_g = 1'b1; else begin
+                r0 = calculate_expected_f_arith(s, a, b, 1'b0);
+                calculate_expected_g = r0[4];
             end
         end
     endfunction
@@ -141,8 +129,7 @@ module tb_ula_74181;
     task verify_operation;
         input [3:0] s_val, a_val, b_val;
         input m_val, c_in_val;
-        reg [4:0] result_arith;
-        reg [3:0] op_result;
+    reg [4:0] result_arith;
         begin
             s = s_val; a = a_val; b = b_val; m = m_val; c_in = c_in_val;
             #5;
@@ -154,27 +141,8 @@ module tb_ula_74181;
                 result_arith = calculate_expected_f_arith(s, a, b, c_in);
                 expected_f = result_arith[3:0];
                 expected_cout = calculate_expected_cout(s, result_arith, m);
-                case(s)
-                    4'b0000: op_result = 4'b1111;
-                    4'b0001: op_result = a | b;
-                    4'b0010: op_result = a | b;
-                    4'b0011: op_result = 4'b1111;
-                    4'b0100: op_result = a & b;
-                    4'b0101: op_result = (a | b) | (a & b);
-                    4'b0110: op_result = ~b;
-                    4'b0111: op_result = a & ~b;
-                    4'b1000: op_result = a & ~b;
-                    4'b1001: op_result = b;
-                    4'b1010: op_result = (a | ~b) | (a & b);
-                    4'b1011: op_result = a & b;
-                    4'b1100: op_result = a;
-                    4'b1101: op_result = (a | b) | a;
-                    4'b1110: op_result = (a | ~b) | a;
-                    4'b1111: op_result = a;
-                    default: op_result = 4'b0000;
-                endcase
-                expected_p = calculate_expected_p(a, op_result, m);
-                expected_g = calculate_expected_g(a, op_result, m);
+        expected_p = calculate_expected_p(s, a, b, m);
+        expected_g = calculate_expected_g(s, a, b, m);
             end
         expected_eq = (a == b);
         test_pass = (f === expected_f) && (c_out === expected_cout) && 

@@ -114,8 +114,6 @@ Documentação detalhada está disponível na pasta `doc/`:
 
 - [**documentacao_adicional.md**](doc/documentacao_adicional.md): Detalhes gerais e funcionalidades das ULAs
 - [**arquitetura_tecnica.md**](doc/arquitetura_tecnica.md): Arquitetura técnica e considerações de design
-- [**guia_referencia_rapida.md**](doc/guia_referencia_rapida.md): Tabela de referência para todas as operações
 - [**guia_simulacao.md**](doc/guia_simulacao.md): Instruções detalhadas para executar simulações
-- [**sinais_p_g_explicacao.md**](doc/sinais_p_g_explicacao.md): Explicação técnica dos sinais P e G
 
 -----
