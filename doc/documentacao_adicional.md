@@ -28,41 +28,62 @@ A ULA 74181 possui dois modos de operação controlados pelo sinal M:
 ### Conjunto de operações
 A ULA implementa as 16 funções lógicas e 16 funções aritméticas exatamente como definido no datasheet, incluindo:
 
-Modo Lógico (M=1):
-- S=0000: ~A
-- S=0001: ~(A | B)
-- S=0010: (~A) & B
-- S=0011: 0
-- S=0100: ~(A & B)
-- S=0101: ~B
-- S=0110: A ^ B
-- S=0111: A & (~B)
-- S=1000: (~A) | B
-- S=1001: ~(A ^ B)
-- S=1010: B
-- S=1011: A & B
-- S=1100: 1
-- S=1101: A | (~B)
-- S=1110: A | B
-- S=1111: A
+Modo Lógico (M = 1)
 
-Modo Aritmético (M=0):
-- S=0000: A - 1
-- S=0001: A + (A|B)
-- S=0010: (A|B) - 1
-- S=0011: -1
-- S=0100: A + (A&B)
-- S=0101: (A|B) + (A&B)
-- S=0110: A - B - 1
-- S=0111: (A&~B) - 1
-- S=1000: A + (A&~B)
-- S=1001: A + B
-- S=1010: (A|~B) + (A&B)
-- S=1011: (A&B) - 1
-- S=1100: A + A
-- S=1101: (A|B) + A
-- S=1110: (A|~B) + A
-- S=1111: A
+* S=0000: F = ~A (NOT A)
+* S=0001: F = ~(A & B) (NAND)
+* S=0010: F = ~A + B
+* S=0011: F = 1
+* S=0100: F = ~(A + B) (NOR)
+* S=0101: F = ~B (NOT B)
+* S=0110: F = ~(A ^ B) (XNOR)
+* S=0111: F = A + ~B
+* S=1000: F = ~A & B
+* S=1001: F = A ^ B (XOR)
+* S=1010: F = B
+* S=1011: F = A + B (OR)
+* S=1100: F = 0
+* S=1101: F = A + ~B
+* S=1110: F = A & B (AND)
+* S=1111: F = A
+
+Modo Aritmético (M = 0) Com Carry de Entrada Baixo (Cn = 0)
+
+* S=0000: F = A - 1
+* S=0001: F = (A & B) - 1
+* S=0010: F = (A & ~B) - 1
+* S=0011: F = -1
+* S=0100: F = A + (A + ~B)
+* S=0101: F = (A & B) + (A + ~B)
+* S=0110: F = A - B - 1
+* S=0111: F = A + ~B
+* S=1000: F = A + (A + B)
+* S=1001: F = A + B
+* S=1010: F = (A & ~B) + (A + B)
+* S=1011: F = A + B
+* S=1100: F = A + A
+* S=1101: F = (A & B) + A
+* S=1110: F = (A & ~B) + A
+* S=1111: F = A
+
+Com Carry de Entrada Alto (Cn = 1)
+
+* S=0000: F = A
+* S=0001: F = A & B
+* S=0010: F = A & ~B
+* S=0011: F = 0
+* S=0100: F = A + (A + ~B) + 1
+* S=0101: F = (A & B) + (A + ~B) + 1
+* S=0110: F = A - B
+* S=0111: F = (A + ~B) + 1
+* S=1000: F = A + (A + B) + 1
+* S=1001: F = A + B + 1
+* S=1010: F = (A & ~B) + (A + B) + 1
+* S=1011: F = (A + B) + 1
+* S=1100: F = A + A + 1
+* S=1101: F = (A & B) + A + 1
+* S=1110: F = (A & ~B) + A + 1
+* S=1111: F = A + 1
 
 ## Comportamento da ULA de 8 bits
 

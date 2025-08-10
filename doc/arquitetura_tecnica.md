@@ -110,6 +110,6 @@ Para uma implementação mais eficiente, poderiam ser consideradas as seguintes 
 As duas implementações foram verificadas usando os seguintes métodos:
 
 1. **Teste unitário**: Validação de cada operação individualmente
-2. **Verificação contra datasheet**: Comparação com tabelas de verdade do datasheet
+2. **Verificação com datasheet**: Comparação com tabelas de verdade do datasheet
 3. **Testes de borda**: Verificação com valores extremos (todos 0s, todos 1s)
 4. **Cobertura funcional**: Garantir que todos os modos e operações sejam testados
