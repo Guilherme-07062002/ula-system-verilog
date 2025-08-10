@@ -32,8 +32,8 @@ C_in --->|                                   |
    - No modo aritmético (M=0): Y depende dos sinais S e contribui para o cálculo do carry
 
 2. **Cálculo de P e G**:
-   - P (Propagate) = P3 & P2 & P1 & P0
-   - G (Generate) = G3 + (P3 & G2) + (P3 & P2 & G1) + (P3 & P2 & P1 & G0)
+   - Forma operacional adotada no código: obtenha Cn+4 com Cin=0 e Cin=1. Defina G = Cn+4|Cin=0 e P = (Cn+4|Cin=1) & ~G, satisfazendo Cn+4 = G | (P & Cin).
+   - Observação: essa definição é equivalente à formulação clássica via Pn/Gn por bit (P3..P0, G3..G0) do datasheet.
 
 3. **Cálculo do Carry out (visão da implementação)**:
     - O módulo 4 bits expõe dois sinais relacionados a carry:
@@ -90,10 +90,7 @@ M -------------->|                |-----> A=B_MSB
 
 ## Comportamento de Carry em Operações de Subtração
 
-Um aspecto importante a considerar é o tratamento de carry em operações de subtração. No 74181, algumas operações de subtração têm o carry invertido para manter a compatibilidade com o datasheet original:
-
-1. Em um subconjunto específico de funções do modo aritmético (S ∈ {0000, 0010, 0011, 0110, 0111, 1011}), o carry-out reportado (`c_out`) é o complemento do carry real, conforme a convenção da 74181.
-2. Nas demais funções aritméticas (por exemplo, S=1001 A+B), `c_out` reporta o carry real.
+Resumo: em um subconjunto de funções aritméticas (S ∈ {0000, 0010, 0011, 0110, 0111, 1011}) o `c_out` segue a convenção do 74181 com complementação. Para detalhes e lista completa, veja `doc/documentacao_adicional.md`.
 
 ## Otimizações Possíveis
 

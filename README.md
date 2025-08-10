@@ -55,22 +55,12 @@ Esta implementação combina duas instâncias da ULA 74181 para criar uma ULA de
 
 ## Testbenches e Simulação
 
-### Testbenches Implementados
+Há um testbench consolidado por ULA cobrindo operações, ambas as polaridades de `c_in` e casos dirigidos:
 
-Há um único testbench “completo” para cada ULA, cobrindo todas as 32 funções (16 lógicas + 16 aritméticas), ambas as polaridades de `c_in` e casos dirigidos:
+- `tb/tb_ula_74181.sv` (4 bits)
+- `tb/tb_ula_8_bits.sv` (8 bits)
 
-- **`tb/tb_ula_74181.sv`**: Testbench consolidado e completo para a ULA 74181 (4 bits).
-- **`tb/tb_ula_8_bits.sv`**: Testbench consolidado e completo para a ULA de 8 bits (com verificação de ripple carry e overflow).
-
-### Arquivos de Simulação (pasta sim/)
-
-A pasta `sim/` contém os arquivos gerados durante a simulação:
-
-- **Arquivos VCD**: Arquivos de Change Dump que registram as alterações nos sinais durante a simulação. Estes podem ser visualizados usando ferramentas como GTKWave para análise detalhada das formas de onda.
-  - `ula_74181.vcd`: Resultados da simulação da ULA de 4 bits
-  - `ula_8_bits.vcd`: Resultados da simulação da ULA de 8 bits
-
-- **Arquivos VVP**: Arquivos executáveis compilados pelo Icarus Verilog, prontos para serem executados para realizar a simulação.
+Para executar as simulações, use os scripts em `build/` (Windows e Linux/macOS) ou siga o guia detalhado em `doc/guia_simulacao.md`.
 
 ## Resultados das Simulações
 
@@ -84,25 +74,14 @@ A pasta `sim/` contém os arquivos gerados durante a simulação:
 - Validada com varredura de modos (m), funções (s) e c_in, além de casos dirigidos (carry entre nibbles e overflow); os testbenches atuais reportam todos os casos aprovados após recompilação
 
 
-## Como Executar as Simulações
+## Como Executar
 
-Para simular o projeto, você precisará ter o **Icarus Verilog** e o **GTKWave** instalados em seu sistema.
+Use:
 
-O projeto inclui scripts automatizados para compilar e executar todos os testbenches de maneira simplificada e visual a partir de um menu interativo:
+- Windows: `build/build.bat`
+- Linux/macOS: `build/build.sh`
 
-- **build/build.bat**: Script para Windows
-- **build/build.sh**: Script para Linux/macOS
-
-```bash
-# No Windows
-cd build
-.\build.bat
-
-# No Linux/macOS
-cd build
-chmod +x build.sh  # Se necessário
-./build.sh
-```
+Detalhes e execução manual (comandos iverilog/vvp/gtkwave) estão em `doc/guia_simulacao.md`.
 
 ## Análise e Conclusões
 

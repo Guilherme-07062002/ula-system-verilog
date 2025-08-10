@@ -109,7 +109,7 @@ module ula_74181 (
             // Demais funções -> carry direto.
             unique case (s)
                 4'b0000, // A - 1
-                4'b0010, // (A | B) - 1
+                4'b0010, // (A & ~B) - 1
                 4'b0011, // -1
                 4'b0110, // A - B - 1 (A + ~B + Cin)
                 4'b0111, // A + ~B (+1 com Cin=1) -> datasheet apresenta Cout complementado

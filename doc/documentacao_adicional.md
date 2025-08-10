@@ -11,13 +11,12 @@ A ULA 74181 possui dois modos de operação controlados pelo sinal M:
 ### Sinais importantes
 - P (Propagate): Indica a condição de propagação de carry
   - No modo lógico (M=1), P é sempre 0
-  - No modo aritmético (M=0), P é calculado como: (A0|Y0) & (A1|Y1) & (A2|Y2) & (A3|Y3)
-    onde Y são os sinais intermediários da operação
+  - No modo aritmético (M=0), pode ser obtido de forma operacional pela relação de carry: considere Cn+4 com Cin=0 e Cin=1; então
+    G = Cn+4|Cin=0 e P = (Cn+4|Cin=1) & ~G, satisfazendo Cn+4 = G | (P & Cin)
   
 - G (Generate): Indica a condição de geração de carry
   - No modo lógico (M=1), G é sempre 1
-  - No modo aritmético (M=0), G é calculado pela fórmula: G3 + P3·G2 + P3·P2·G1 + P3·P2·P1·G0
-    onde Gn = (An & Yn) e Pn = (An | Yn)
+  - No modo aritmético (M=0), G corresponde ao carry verdadeiro quando Cin=0 (ver definição acima)
 
 - Carry-out: Comportamento varia conforme o modo e a operação selecionada
   - No modo lógico (M=1), C_out é sempre 0
@@ -119,30 +118,7 @@ Os testbenches confirmam que ambas as implementações estão em perfeita confor
 
 ## Como Executar os Testes
 
-Para executar qualquer um dos testbenches, use os seguintes comandos:
-
-```bash
-# Para compilar o testbench da ULA de 4 bits
-iverilog -g2012 -o sim/NOME_TESTBENCH.vvp rtl/ula_74181.sv tb/NOME_TESTBENCH.sv
-
-# Para compilar o testbench da ULA de 8 bits
-iverilog -g2012 -o sim/NOME_TESTBENCH.vvp rtl/ula_74181.sv rtl/ula_8_bits.sv tb/NOME_TESTBENCH.sv
-
-# Para executar o testbench compilado
-vvp sim/NOME_TESTBENCH.vvp
-
-# Para visualizar as formas de onda geradas
-gtkwave sim/NOME_TESTBENCH.vcd
-```
-
-Por exemplo, para executar o testbench da ULA de 4 bits:
-
-```bash
-iverilog -g2012 -o sim/ula_74181.vvp rtl/ula_74181.sv tb/tb_ula_74181.sv
-vvp sim/ula_74181.vvp
-```
-
-Os resultados dos testes serão exibidos no terminal e os arquivos .vcd serão gerados para análise com GTKWave, se necessário.
+Consulte o guia dedicado em `doc/guia_simulacao.md` para instruções passo a passo (scripts e execução manual com Icarus/GTKWave).
 
 ## Conclusão
 
